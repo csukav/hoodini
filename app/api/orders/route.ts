@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { createOrder } from "@/lib/firestoreOrders";
 import type { OrderInput } from "@/lib/firestoreOrders";
 import type { OrderItem } from "@/types";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// Ha a domain még nincs hitelesítve Resend-ben, a RESEND_FROM és RESEND_TEST_TO
-// env változókkal konfigurálható. Hitelesített domain után töröld a RESEND_TEST_TO-t.
-const FROM_EMAIL = process.env.RESEND_FROM ?? "onboarding@resend.dev";
-const TEST_TO = process.env.RESEND_TEST_TO ?? null; // pl. csukav@gmail.com tesztnél
+const transporter = nodemailer.createTransport({
+  host: "smtp.gmail.com",
+  port: 587,
+  secure: false,
+  auth: {
+    user: process.env.GMAIL_USER,
+    pass: process.env.GMAIL_APP_PASSWORD,
+  },
+});
 
 const SHIPPING_THRESHOLD = 15_000;
 const SHIPPING_COST = 1_490;
@@ -174,15 +177,12 @@ export async function POST(req: NextRequest) {
 
     // Email küldés – nem blokkoljuk a rendelés sikerét, ha hiba van
     try {
-      const emailResult = await resend.emails.send({
-        from: `Hoodini <${FROM_EMAIL}>`,
-        to: TEST_TO ?? customer.email,
+      await transporter.sendMail({
+        from: `"Hoodini" <${process.env.GMAIL_USER}>`,
+        to: customer.email,
         subject: `Rendelés visszaigazolás – #${orderId.slice(-8).toUpperCase()}`,
         html: buildEmailHtml(orderId, orderInput),
       });
-      if (emailResult.error) {
-        console.error("Resend email error:", emailResult.error);
-      }
     } catch (emailErr) {
       console.error("Email sending failed (order saved):", emailErr);
     }

@@ -8,21 +8,21 @@ import { getProducts } from "@/lib/firestoreProducts";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Főoldal – Prémium Streetwear & Hoodiék",
+  title: "Főoldal – Prémium Streetwear & Hoodie",
   description:
     "Üdvözlünk a Hoodini webshopban! Fedezd fel legújabb streetwear kollekcióinkat, prémium hoodiékat és egyedi darabokat ingyenes kiszállítással.",
 };
 
 const categories = [
   {
-    label: "HOODIÉK",
+    label: "HOODIE",
     sub: "Prémium fit, minden napra.",
     href: "/products",
     image:
       "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=900&q=80",
   },
   {
-    label: "PÓLÓK & TOPOK",
+    label: "PÓLÓK",
     sub: "Könnyű, légáteresztő anyagok.",
     href: "/products",
     image:
