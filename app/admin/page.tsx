@@ -69,6 +69,12 @@ export default function AdminDashboardPage() {
           </span>
           <div className="flex items-center gap-3">
             <Link
+              href="/admin/orders"
+              className="border border-stone-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-stone-600 hover:bg-stone-100"
+            >
+              Rendelések
+            </Link>
+            <Link
               href="/admin/products/new"
               className="bg-stone-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-stone-700"
             >

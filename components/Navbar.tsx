@@ -8,11 +8,10 @@ import { useCart } from "@/context/CartContext";
 const leftLinks = [
   { href: "/products", label: "HOODIE" },
   { href: "/products", label: "PÓLÓK" },
-];
-const rightLinks = [
   { href: "/products", label: "NADRÁGOK" },
   { href: "/products", label: "SALE" },
 ];
+const rightLinks = [{ href: "/help", label: "GYIK" }];
 const mobileLinks = [
   { href: "/products", label: "Hoodie" },
   { href: "/products", label: "Pólók" },
@@ -53,7 +52,7 @@ export default function Navbar() {
                 <li key={l.label}>
                   <Link
                     href={l.href}
-                    className="label-xs text-stone-600 hover:text-stone-950 transition-colors"
+                    className="label-xl text-stone-600 hover:text-stone-950 transition-colors"
                   >
                     {l.label}
                   </Link>
@@ -77,7 +76,7 @@ export default function Navbar() {
                   <li key={l.label}>
                     <Link
                       href={l.href}
-                      className="label-xs text-stone-600 hover:text-stone-950 transition-colors"
+                      className="label-xl text-stone-600 hover:text-stone-950 transition-colors"
                     >
                       {l.label}
                     </Link>

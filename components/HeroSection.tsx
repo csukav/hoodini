@@ -11,10 +11,11 @@ export default function HeroSection() {
     >
       {/* Full-bleed background image */}
       <Image
-        src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1800&q=85"
+        src="/hero.jpg"
         alt=""
         fill
         priority
+        quality={95}
         sizes="100vw"
         className="object-cover"
       />

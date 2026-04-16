@@ -128,10 +128,13 @@ export default function CartContent() {
             </div>
 
             {/* Checkout CTA */}
-            <button className="btn-dark w-full mt-6 justify-center flex items-center gap-2 py-3.5">
+            <Link
+              href="/checkout"
+              className="btn-dark w-full mt-6 justify-center flex items-center gap-2 py-3.5"
+            >
               Tovább a fizetéshez
               <ArrowRight className="w-4 h-4" aria-hidden="true" />
-            </button>
+            </Link>
 
             <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-400">
               <ShieldCheck className="w-3.5 h-3.5" aria-hidden="true" />
