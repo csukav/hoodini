@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { stripe } from "@/lib/stripe";
 import type { OrderItem } from "@/types";
 
@@ -38,19 +37,17 @@ export async function POST(req: NextRequest) {
     );
     const shippingCost = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
 
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = items.map(
-      (item) => ({
-        price_data: {
-          currency: "huf",
-          product_data: {
-            name: item.productName,
-            ...(item.image ? { images: [item.image] } : {}),
-          },
-          unit_amount: item.price,
+    const lineItems = items.map((item) => ({
+      price_data: {
+        currency: "huf",
+        product_data: {
+          name: item.productName,
+          ...(item.image ? { images: [item.image] } : {}),
         },
-        quantity: item.quantity,
-      }),
-    );
+        unit_amount: item.price,
+      },
+      quantity: item.quantity,
+    }));
 
     // Add shipping as a line item if not free
     if (shippingCost > 0) {
