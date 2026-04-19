@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
+import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 export const metadata: Metadata = {
   title: "Rendelés visszaigazolva – Hoodini",
@@ -21,6 +23,19 @@ export default async function CheckoutSuccessPage({
         searchParams.session_id,
       );
       paid = session.payment_status === "paid";
+
+      // If paid, update the order in Firestore
+      if (paid && session.metadata?.orderId) {
+        const orderRef = doc(db, "orders", session.metadata.orderId);
+        const orderSnap = await getDoc(orderRef);
+        if (orderSnap.exists() && !orderSnap.data().stripeSessionId) {
+          await updateDoc(orderRef, {
+            status: "confirmed",
+            stripeSessionId: session.id,
+            updatedAt: serverTimestamp(),
+          });
+        }
+      }
     } catch {
       // session not found – show generic success
     }
