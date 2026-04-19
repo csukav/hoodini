@@ -92,7 +92,7 @@ export default function CheckoutPage() {
 
       if (!res.ok) {
         const data = await res.json();
-        setServerError(data.error ?? "Ismeretlen hiba.");
+        setServerError(data.details ?? data.error ?? "Ismeretlen hiba.");
         setLoading(false);
         return;
       }

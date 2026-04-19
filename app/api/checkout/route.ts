@@ -86,10 +86,11 @@ export async function POST(req: NextRequest) {
     });
 
     return NextResponse.json({ url: session.url }, { status: 200 });
-  } catch (err) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Ismeretlen hiba";
     console.error("Stripe checkout session error:", err);
     return NextResponse.json(
-      { error: "Hiba a fizetési munkamenet létrehozásakor." },
+      { error: "Hiba a fizetési munkamenet létrehozásakor.", details: message },
       { status: 500 },
     );
   }
