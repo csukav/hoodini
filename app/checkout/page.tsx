@@ -71,7 +71,7 @@ export default function CheckoutPage() {
     }));
 
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -97,9 +97,9 @@ export default function CheckoutPage() {
         return;
       }
 
-      const { orderId } = await res.json();
+      const { url } = await res.json();
       clearCart();
-      router.push(`/checkout/success?orderId=${orderId}`);
+      window.location.href = url;
     } catch {
       setServerError("Hálózati hiba. Próbáld újra.");
       setLoading(false);
@@ -313,7 +313,7 @@ export default function CheckoutPage() {
                 disabled={loading}
                 className="btn-dark w-full mt-6 justify-center flex items-center gap-2 py-3.5 disabled:opacity-60"
               >
-                {loading ? "Feldolgozás..." : "Megrendelés elküldése"}
+                {loading ? "Átirányítás a fizetéshez..." : "Fizetés"}
               </button>
 
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-400">

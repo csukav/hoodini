@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import Image from "next/image";
 import Link from "next/link";
 import { Star, Package, Truck, RotateCcw, ChevronRight } from "lucide-react";
 import { getProductBySlug } from "@/lib/firestoreProducts";
 import { formatPrice } from "@/lib/utils";
 import AddToCartButton from "@/components/AddToCartButton";
+import ImageLightbox from "@/components/ImageLightbox";
 
 export const dynamic = "force-dynamic";
 
@@ -113,16 +113,7 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           {/* ── Product image ── */}
-          <div className="relative aspect-square overflow-hidden bg-stone-100">
-            <Image
-              src={product.image}
-              alt={product.name}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-              className="object-cover"
-            />
-          </div>
+          <ImageLightbox src={product.image} alt={product.name} />
 
           {/* ── Product details ── */}
           <div className="flex flex-col">
