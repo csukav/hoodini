@@ -22,7 +22,7 @@ export default function AddToCartButton({ product }: { product: Product }) {
       onClick={handleAdd}
       disabled={product.stock === 0}
       aria-live="polite"
-      className="w-full sm:w-auto"
+      className="w-full sm:w-auto bg-stone-900 text-white border-2 border-stone-900 hover:bg-stone-800 hover:border-stone-800"
     >
       {added ? (
         <>
