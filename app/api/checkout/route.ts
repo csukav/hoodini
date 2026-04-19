@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
+import { createOrder } from "@/lib/firestoreOrders";
+import type { OrderInput } from "@/lib/firestoreOrders";
 import type { OrderItem } from "@/types";
 
 const SHIPPING_THRESHOLD = 15_000;
@@ -63,23 +65,26 @@ export async function POST(req: NextRequest) {
 
     const origin = req.nextUrl.origin;
 
+    // Create order in Firestore immediately (pending status)
+    const orderInput: OrderInput = {
+      status: "pending",
+      customer,
+      shippingAddress,
+      items,
+      subtotal,
+      shippingCost,
+      total: subtotal + shippingCost,
+      note: note ?? "",
+    };
+    const orderId = await createOrder(orderInput);
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       mode: "payment",
       customer_email: customer.email,
       line_items: lineItems,
       metadata: {
-        customerName: customer.name,
-        customerEmail: customer.email,
-        customerPhone: customer.phone,
-        shippingZip: shippingAddress.zip,
-        shippingCity: shippingAddress.city,
-        shippingAddress: shippingAddress.address,
-        note: note ?? "",
-        items: JSON.stringify(items),
-        subtotal: subtotal.toString(),
-        shippingCost: shippingCost.toString(),
-        total: (subtotal + shippingCost).toString(),
+        orderId,
       },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout`,

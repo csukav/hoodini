@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { stripe } from "@/lib/stripe";
-import { createOrder } from "@/lib/firestoreOrders";
-import type { OrderInput } from "@/lib/firestoreOrders";
-import type { OrderItem } from "@/types";
+import { getOrderById } from "@/lib/firestoreOrders";
+import type { Order } from "@/types";
+import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "@/lib/firebase";
 
 const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
@@ -22,10 +23,10 @@ function formatPrice(n: number) {
   return n.toLocaleString("hu-HU") + " Ft";
 }
 
-function buildEmailHtml(orderId: string, order: OrderInput): string {
+function buildEmailHtml(order: Order): string {
   const itemRows = order.items
     .map(
-      (item: OrderItem) => `
+      (item) => `
       <tr>
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;">
           ${item.image ? `<img src="${item.image}" alt="${item.productName}" width="56" height="56" style="object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:12px;" />` : ""}
@@ -58,7 +59,7 @@ function buildEmailHtml(orderId: string, order: OrderInput): string {
             <table style="background:#f5f5f4;width:100%;padding:16px;margin-bottom:28px;" cellpadding="0" cellspacing="0">
               <tr>
                 <td style="font-size:12px;color:#a8a29e;text-transform:uppercase;letter-spacing:1px;">Rendelési azonosító</td>
-                <td style="font-size:12px;color:#0c0a09;font-weight:700;text-align:right;">#${orderId.slice(-8).toUpperCase()}</td>
+                <td style="font-size:12px;color:#0c0a09;font-weight:700;text-align:right;">#${order.id.slice(-8).toUpperCase()}</td>
               </tr>
             </table>
 
@@ -135,44 +136,35 @@ export async function POST(req: NextRequest) {
 
   if (event.type === "checkout.session.completed") {
     const session = event.data.object as Stripe.Checkout.Session;
-    const meta = session.metadata!;
+    const orderId = session.metadata?.orderId;
 
-    const items: OrderItem[] = JSON.parse(meta.items);
+    if (!orderId) {
+      console.error("Webhook: no orderId in session metadata");
+      return NextResponse.json({ error: "No orderId" }, { status: 400 });
+    }
 
-    const orderInput: OrderInput = {
+    // Update order status to confirmed + save stripeSessionId
+    await updateDoc(doc(db, "orders", orderId), {
       status: "confirmed",
-      customer: {
-        name: meta.customerName,
-        email: meta.customerEmail,
-        phone: meta.customerPhone,
-      },
-      shippingAddress: {
-        zip: meta.shippingZip,
-        city: meta.shippingCity,
-        address: meta.shippingAddress,
-      },
-      items,
-      subtotal: parseInt(meta.subtotal, 10),
-      shippingCost: parseInt(meta.shippingCost, 10),
-      total: parseInt(meta.total, 10),
-      note: meta.note || "",
-    };
-
-    const orderId = await createOrder({
-      ...orderInput,
       stripeSessionId: session.id,
-    } as OrderInput & { stripeSessionId: string });
+      updatedAt: serverTimestamp(),
+    });
+
+    // Fetch the full order for the email
+    const order = await getOrderById(orderId);
 
     // Send confirmation email
-    try {
-      await transporter.sendMail({
-        from: `"Hoodini" <${process.env.GMAIL_USER}>`,
-        to: meta.customerEmail,
-        subject: `Rendelés visszaigazolás – #${orderId.slice(-8).toUpperCase()}`,
-        html: buildEmailHtml(orderId, orderInput),
-      });
-    } catch (emailErr) {
-      console.error("Email sending failed (order saved):", emailErr);
+    if (order) {
+      try {
+        await transporter.sendMail({
+          from: `"Hoodini" <${process.env.GMAIL_USER}>`,
+          to: order.customer.email,
+          subject: `Rendelés visszaigazolás – #${orderId.slice(-8).toUpperCase()}`,
+          html: buildEmailHtml(order),
+        });
+      } catch (emailErr) {
+        console.error("Email sending failed (order saved):", emailErr);
+      }
     }
   }
 
