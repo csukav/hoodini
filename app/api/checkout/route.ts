@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
           name: item.productName,
           ...(item.image ? { images: [item.image] } : {}),
         },
-        unit_amount: item.price,
+        unit_amount: item.price * 100,
       },
       quantity: item.quantity,
     }));
@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
         price_data: {
           currency: "huf",
           product_data: { name: "Szállítási költség" },
-          unit_amount: shippingCost,
+          unit_amount: shippingCost * 100,
         },
         quantity: 1,
       });
