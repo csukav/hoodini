@@ -50,4 +50,5 @@ export interface Order {
   shippingCost: number;
   total: number;
   note?: string;
+  stripeSessionId?: string;
 }

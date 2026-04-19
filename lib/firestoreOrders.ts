@@ -39,6 +39,7 @@ function toOrder(id: string, data: DocumentData): Order {
     shippingCost: data.shippingCost ?? 0,
     total: data.total ?? 0,
     note: data.note ?? "",
+    stripeSessionId: data.stripeSessionId ?? undefined,
   };
 }
 

@@ -86,6 +86,15 @@ function OrderRow({
           {formatPrice(order.total)}
         </span>
         <StatusBadge status={order.status} />
+        {order.stripeSessionId ? (
+          <span className="inline-block rounded-full px-3 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-700">
+            Fizetve
+          </span>
+        ) : (
+          <span className="inline-block rounded-full px-3 py-0.5 text-xs font-semibold bg-orange-100 text-orange-700">
+            Nincs fizetve
+          </span>
+        )}
         {open ? (
           <ChevronUp className="w-4 h-4 text-stone-400 shrink-0" />
         ) : (
@@ -171,6 +180,22 @@ function OrderRow({
 
             {/* Status change */}
             <div className="mt-5">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-xs font-semibold uppercase tracking-widest text-stone-400">
+                  Fizetés:
+                </span>
+                {order.stripeSessionId ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                    Sikeres (Stripe)
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-orange-700">
+                    <span className="w-2 h-2 rounded-full bg-orange-500" />
+                    Nincs online fizetés
+                  </span>
+                )}
+              </div>
               <label className="block text-xs font-semibold uppercase tracking-widest text-stone-400 mb-1.5">
                 Státusz módosítása
               </label>
