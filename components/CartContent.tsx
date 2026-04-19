@@ -7,7 +7,7 @@ import CartItemRow from "@/components/CartItemRow";
 import { formatPrice } from "@/lib/utils";
 
 const SHIPPING_THRESHOLD = 15_000;
-const SHIPPING_COST = 200;
+const SHIPPING_COST = 0;
 
 export default function CartContent() {
   const { items, totalPrice, totalItems, clearCart } = useCart();

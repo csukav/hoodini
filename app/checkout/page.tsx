@@ -9,7 +9,7 @@ import { formatPrice } from "@/lib/utils";
 import type { OrderItem } from "@/types";
 
 const SHIPPING_THRESHOLD = 15_000;
-const SHIPPING_COST = 1_490;
+const SHIPPING_COST = 0;
 
 export default function CheckoutPage() {
   const router = useRouter();

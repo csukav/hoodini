@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const SHIPPING_THRESHOLD = 15_000;
-const SHIPPING_COST = 1_490;
+const SHIPPING_COST = 0;
 
 function formatPrice(n: number) {
   return n.toLocaleString("hu-HU") + " Ft";

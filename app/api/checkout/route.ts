@@ -5,7 +5,7 @@ import type { OrderInput } from "@/lib/firestoreOrders";
 import type { OrderItem } from "@/types";
 
 const SHIPPING_THRESHOLD = 15_000;
-const SHIPPING_COST = 1_490;
+const SHIPPING_COST = 0;
 
 export async function POST(req: NextRequest) {
   try {
