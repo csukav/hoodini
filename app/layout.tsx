@@ -60,6 +60,8 @@ export const metadata: Metadata = {
     follow: true,
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
+  // Google Search Console hitelesítés – cseréld ki a saját kódodra:
+   verification: { google: "bUAXV1LMsFSTTJaOmOr-LsbU-E-VqU3l31xbcuyHYjE" },
 };
 
 export default function RootLayout({
