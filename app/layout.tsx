@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
@@ -71,6 +72,19 @@ export default function RootLayout({
 }) {
   return (
     <html lang="hu" className={`${inter.variable} ${playfair.variable}`}>
+      {/* Google Analytics 4 */}
+      <Script
+        src="https://www.googletagmanager.com/gtag/js?id=G-72WJP8ZPFR"
+        strategy="afterInteractive"
+      />
+      <Script id="ga4-init" strategy="afterInteractive">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-72WJP8ZPFR');
+        `}
+      </Script>
       <body className="font-sans bg-stone-50 text-stone-950 antialiased">
         <CartProvider>
           <Navbar />
