@@ -10,12 +10,13 @@ import ImageLightbox from "@/components/ImageLightbox";
 export const dynamic = "force-dynamic";
 
 interface Props {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }
 
 /* ── SEO Metadata ────────────────────────────────────────────────── */
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const product = await getProductBySlug(params.slug);
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Termék nem található" };
 
   return {
@@ -36,7 +37,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 /* ── Page ────────────────────────────────────────────────────────── */
 export default async function ProductPage({ params }: Props) {
-  const product = await getProductBySlug(params.slug);
+  const { slug } = await params;
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
   /* JSON-LD – sanitised to prevent script injection */
@@ -189,7 +191,7 @@ export default async function ProductPage({ params }: Props) {
               {benefits.map(({ icon: Icon, title, desc }) => (
                 <li key={title} className="flex items-start gap-3">
                   <Icon
-                    className="w-5 h-5 text-stone-700 flex-shrink-0 mt-0.5"
+                    className="w-5 h-5 text-stone-700 shrink-0 mt-0.5"
                     aria-hidden="true"
                   />
                   <div>
