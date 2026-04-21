@@ -91,7 +91,7 @@ export default async function ProductPage({ params }: Props) {
         dangerouslySetInnerHTML={{ __html: jsonLdStr }}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
         {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
@@ -158,11 +158,6 @@ export default async function ProductPage({ params }: Props) {
               </span>
             </div>
 
-            {/* Description */}
-            <p className="mt-5 text-stone-600 leading-relaxed">
-              {product.description}
-            </p>
-
             {/* Stock indicator */}
             <div className="mt-5 flex items-center gap-2">
               <Package className="w-5 h-5 text-gray-400" aria-hidden="true" />
@@ -185,6 +180,11 @@ export default async function ProductPage({ params }: Props) {
             <div className="mt-8">
               <AddToCartButton product={product} />
             </div>
+
+            {/* Description */}
+            <p className="mt-6 text-stone-600 leading-relaxed">
+              {product.description}
+            </p>
 
             {/* Benefits */}
             <ul className="mt-8 pt-8 border-t border-stone-200 grid grid-cols-1 sm:grid-cols-3 gap-4">

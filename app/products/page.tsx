@@ -18,7 +18,7 @@ export default async function ProductsPage() {
   ];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
       <p className="label-xs text-stone-500 mb-1">Kollekció</p>
       <h1 className="heading-display text-3xl sm:text-4xl text-stone-950 mb-1">
         Összes termék
