@@ -27,6 +27,8 @@ export const metadata: Metadata = {
   description:
     "Fedezd fel a Hoodini prémium streetwear kollekcióját. Egyedi hoodiék, pólók és kiegészítők gyors kiszállítással, 30 napos visszaküldési garanciával.",
   keywords: [
+    "balaclava hoodie",
+    "balaclava kapucnis pulóver",
     "hoodie",
     "streetwear",
     "ruházat",
