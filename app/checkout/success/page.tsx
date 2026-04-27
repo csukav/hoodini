@@ -4,6 +4,7 @@ import { CheckCircle2 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import GadsConversionEvent from "@/components/GadsConversionEvent";
 
 export const metadata: Metadata = {
   title: "Rendelés visszaigazolva – Hoodini",
@@ -16,6 +17,8 @@ export default async function CheckoutSuccessPage({
   searchParams: { session_id?: string; orderId?: string };
 }) {
   let paid = false;
+  let conversionValue: number | undefined;
+  let transactionId: string | undefined;
 
   if (searchParams.session_id) {
     try {
@@ -24,16 +27,22 @@ export default async function CheckoutSuccessPage({
       );
       paid = session.payment_status === "paid";
 
-      // If paid, update the order in Firestore
-      if (paid && session.metadata?.orderId) {
-        const orderRef = doc(db, "orders", session.metadata.orderId);
-        const orderSnap = await getDoc(orderRef);
-        if (orderSnap.exists() && !orderSnap.data().stripeSessionId) {
-          await updateDoc(orderRef, {
-            status: "confirmed",
-            stripeSessionId: session.id,
-            updatedAt: serverTimestamp(),
-          });
+      if (paid) {
+        // HUF has no decimal places in Stripe, so amount_total is already HUF
+        conversionValue = session.amount_total ?? undefined;
+        transactionId = session.metadata?.orderId ?? session.id;
+
+        // Update the order in Firestore
+        if (session.metadata?.orderId) {
+          const orderRef = doc(db, "orders", session.metadata.orderId);
+          const orderSnap = await getDoc(orderRef);
+          if (orderSnap.exists() && !orderSnap.data().stripeSessionId) {
+            await updateDoc(orderRef, {
+              status: "confirmed",
+              stripeSessionId: session.id,
+              updatedAt: serverTimestamp(),
+            });
+          }
         }
       }
     } catch {
@@ -43,6 +52,13 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="max-w-xl mx-auto px-4 py-28 text-center">
+      {paid && (
+        <GadsConversionEvent
+          value={conversionValue}
+          currency="HUF"
+          transactionId={transactionId}
+        />
+      )}
       <CheckCircle2
         className="w-20 h-20 mx-auto mb-6 text-emerald-500"
         aria-hidden="true"
