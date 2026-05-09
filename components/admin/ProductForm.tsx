@@ -2,6 +2,8 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { storage } from "@/lib/firebase";
 
 export interface ProductFormValues {
   name: string;
@@ -84,32 +86,33 @@ export default function ProductForm({
     setError(null);
     setUploading(true);
     try {
-      const formData = new FormData();
+      const uploadedUrls: string[] = [];
+
       for (const file of Array.from(files)) {
-        formData.append("files", file);
+        if (!file.type.startsWith("image/")) {
+          throw new Error("Csak kepfajl toltheto fel.");
+        }
+
+        if (file.size > 8 * 1024 * 1024) {
+          throw new Error("Egy kep maximum 8MB lehet.");
+        }
+
+        const fileExt = file.name.includes(".")
+          ? (file.name.split(".").pop()?.toLowerCase() ?? "jpg")
+          : "jpg";
+        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
+        const fileRef = ref(storage, `products/${fileName}`);
+
+        await uploadBytes(fileRef, file, {
+          contentType: file.type,
+        });
+
+        const downloadUrl = await getDownloadURL(fileRef);
+        uploadedUrls.push(downloadUrl);
       }
 
-      const res = await fetch("/api/admin/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const data = (await res.json().catch(() => ({}))) as {
-          error?: string;
-          details?: string;
-          code?: string;
-          cwd?: string;
-        };
-        const messageParts = [data.error ?? `Feltoltesi hiba (${res.status}).`];
-        if (data.details) messageParts.push(data.details);
-        if (data.code) messageParts.push(`Kod: ${data.code}`);
-        throw new Error(messageParts.join(" | "));
-      }
-
-      const data = (await res.json()) as { urls: string[] };
       setValues((v) => {
-        const images = [...v.images, ...data.urls];
+        const images = [...v.images, ...uploadedUrls];
         return {
           ...v,
           images,
