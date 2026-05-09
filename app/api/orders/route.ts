@@ -28,7 +28,10 @@ function buildEmailHtml(orderId: string, order: OrderInput): string {
       <tr>
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;">
           ${item.image ? `<img src="${item.image}" alt="${item.productName}" width="56" height="56" style="object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:12px;" />` : ""}
-          <span style="font-weight:600;">${item.productName}</span>
+          <div>
+            <span style="font-weight:600;">${item.productName}</span>
+            ${item.selectedSize ? `<br /><span style="font-size:12px;color:#a8a29e;">Méret: ${item.selectedSize}</span>` : ""}
+          </div>
         </td>
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;text-align:center;color:#78716c;">${item.quantity} db</td>
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;text-align:right;font-weight:600;">${formatPrice(item.price * item.quantity)}</td>

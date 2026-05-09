@@ -12,7 +12,7 @@ interface CartItemRowProps {
 
 export default function CartItemRow({ item }: CartItemRowProps) {
   const { updateQuantity, removeFromCart } = useCart();
-  const { product, quantity } = item;
+  const { product, quantity, selectedSize } = item;
 
   return (
     <li className="flex gap-4 py-5 border-b border-stone-200 last:border-0">
@@ -38,6 +38,11 @@ export default function CartItemRow({ item }: CartItemRowProps) {
         <p className="text-sm font-bold text-stone-600 mt-1">
           {formatPrice(product.price)}
         </p>
+        {selectedSize && (
+          <p className="text-xs text-stone-500 mt-1">
+            Méret: <span className="font-semibold">{selectedSize}</span>
+          </p>
+        )}
 
         {/* Controls */}
         <div className="flex items-center justify-between mt-3 gap-2">
@@ -48,7 +53,9 @@ export default function CartItemRow({ item }: CartItemRowProps) {
             aria-label="Mennyiség"
           >
             <button
-              onClick={() => updateQuantity(product.id, quantity - 1)}
+              onClick={() =>
+                updateQuantity(product.id, quantity - 1, selectedSize)
+              }
               className="p-2 hover:bg-stone-50 transition-colors text-stone-400 hover:text-stone-900"
               aria-label="Mennyiség csökkentése"
             >
@@ -61,7 +68,9 @@ export default function CartItemRow({ item }: CartItemRowProps) {
               {quantity}
             </span>
             <button
-              onClick={() => updateQuantity(product.id, quantity + 1)}
+              onClick={() =>
+                updateQuantity(product.id, quantity + 1, selectedSize)
+              }
               className="p-2 hover:bg-stone-50 transition-colors text-stone-400 hover:text-stone-900"
               aria-label="Mennyiség növelése"
             >
@@ -71,7 +80,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
 
           {/* Remove */}
           <button
-            onClick={() => removeFromCart(product.id)}
+            onClick={() => removeFromCart(product.id, selectedSize)}
             className="p-2 text-stone-300 hover:text-red-500 transition-colors"
             aria-label={`${product.name} eltávolítása a kosárból`}
           >

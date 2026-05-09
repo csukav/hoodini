@@ -9,11 +9,13 @@ export interface Product {
   stock: number;
   rating: number;
   reviewCount: number;
+  sizes?: string[];
 }
 
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedSize?: string;
 }
 
 export type OrderStatus =
@@ -29,6 +31,7 @@ export interface OrderItem {
   price: number;
   quantity: number;
   image: string;
+  selectedSize?: string;
 }
 
 export interface Order {

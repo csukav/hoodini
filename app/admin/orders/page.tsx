@@ -151,13 +151,16 @@ function OrderRow({
                 <li key={i} className="flex justify-between text-sm">
                   <span className="text-stone-700">
                     {item.productName}{" "}
-                    <span className="text-stone-400">× {item.quantity}</span>
+                    {item.selectedSize && (
+                      <span className="text-stone-500">({item.selectedSize})</span>
+                    )}
+                    <span className="text-stone-400"> × {item.quantity}</span>
                   </span>
                   <span className="font-semibold text-stone-900">
                     {formatPrice(item.price * item.quantity)}
                   </span>
                 </li>
-              ))}
+              ))}}
             </ul>
             <div className="border-t border-stone-100 pt-3 space-y-1.5 text-sm">
               <div className="flex justify-between text-stone-500">

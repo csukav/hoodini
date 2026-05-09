@@ -13,6 +13,7 @@ export interface ProductFormValues {
   description: string;
   rating: number;
   reviewCount: number;
+  sizes: string[];
 }
 
 interface ProductFormProps {
@@ -48,6 +49,7 @@ export default function ProductForm({
     description: initial.description ?? "",
     rating: initial.rating ?? 0,
     reviewCount: initial.reviewCount ?? 0,
+    sizes: (initial.sizes as string[]) ?? [],
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -300,6 +302,31 @@ export default function ProductForm({
             className={fieldClass}
           />
         </div>
+      </div>
+
+      {/* Sizes */}
+      <div>
+        <label className={labelClass}>
+          Elérhető méretek (vessző-elválasztva)
+        </label>
+        <input
+          type="text"
+          placeholder="XS, S, M, L, XL, XXL"
+          value={values.sizes.join(", ")}
+          onChange={(e) =>
+            set(
+              "sizes",
+              e.target.value
+                .split(",")
+                .map((s) => s.trim())
+                .filter((s) => s.length > 0),
+            )
+          }
+          className={fieldClass}
+        />
+        <p className="mt-1 text-xs text-stone-400">
+          A méreteket vesszővel elválasztva add meg (pl. XS, S, M, L)
+        </p>
       </div>
 
       {/* Actions */}
