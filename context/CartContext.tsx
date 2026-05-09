@@ -11,9 +11,13 @@ import type { CartItem, Product } from "@/types";
 
 interface CartContextType {
   items: CartItem[];
-  addToCart: (product: Product) => void;
-  removeFromCart: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addToCart: (product: Product, selectedSize?: string) => void;
+  removeFromCart: (productId: string, selectedSize?: string) => void;
+  updateQuantity: (
+    productId: string,
+    quantity: number,
+    selectedSize?: string,
+  ) => void;
   clearCart: () => void;
   totalItems: number;
   totalPrice: number;
