@@ -85,8 +85,20 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error("[admin/upload] hiba:", error);
     const details = error instanceof Error ? error.message : "Ismeretlen hiba";
+    const code =
+      typeof error === "object" &&
+      error !== null &&
+      "code" in error &&
+      typeof (error as { code?: unknown }).code === "string"
+        ? (error as { code: string }).code
+        : undefined;
     return NextResponse.json(
-      { error: "Feltoltes sikertelen.", details },
+      {
+        error: "Feltoltes sikertelen.",
+        details,
+        code,
+        cwd: process.cwd(),
+      },
       { status: 500 },
     );
   }

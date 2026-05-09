@@ -95,8 +95,16 @@ export default function ProductForm({
       });
 
       if (!res.ok) {
-        const data = await res.json().catch(() => ({}));
-        throw new Error(data.error ?? "Feltöltési hiba.");
+        const data = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          details?: string;
+          code?: string;
+          cwd?: string;
+        };
+        const messageParts = [data.error ?? `Feltoltesi hiba (${res.status}).`];
+        if (data.details) messageParts.push(data.details);
+        if (data.code) messageParts.push(`Kod: ${data.code}`);
+        throw new Error(messageParts.join(" | "));
       }
 
       const data = (await res.json()) as { urls: string[] };
