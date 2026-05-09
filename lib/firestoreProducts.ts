@@ -17,12 +17,20 @@ import type { Product } from "@/types";
 const COL = "products";
 
 function toProduct(id: string, data: DocumentData): Product {
+  const image = data.image ?? "";
+  const images = Array.isArray(data.images)
+    ? data.images
+    : image
+      ? [image]
+      : [];
+
   return {
     id,
     slug: data.slug ?? "",
     name: data.name ?? "",
     price: data.price ?? 0,
-    image: data.image ?? "",
+    image,
+    images,
     description: data.description ?? "",
     category: data.category ?? "",
     stock: data.stock ?? 0,
