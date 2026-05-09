@@ -7,6 +7,22 @@ export const runtime = "nodejs";
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
 
+type UploadLike = {
+  name?: string;
+  type?: string;
+  size?: number;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+};
+
+function isUploadLike(value: unknown): value is UploadLike {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "arrayBuffer" in value &&
+    typeof (value as { arrayBuffer?: unknown }).arrayBuffer === "function"
+  );
+}
+
 function safeFileName(original: string) {
   const ext = path.extname(original).toLowerCase() || ".jpg";
   const base = path
@@ -19,9 +35,8 @@ function safeFileName(original: string) {
 export async function POST(req: NextRequest) {
   try {
     const formData = await req.formData();
-    const files = formData
-      .getAll("files")
-      .filter((f): f is File => f instanceof File);
+    const entries = formData.getAll("files");
+    const files: UploadLike[] = entries.filter(isUploadLike) as UploadLike[];
 
     if (files.length === 0) {
       return NextResponse.json(
@@ -43,21 +58,21 @@ export async function POST(req: NextRequest) {
     const urls: string[] = [];
 
     for (const file of files) {
-      if (!file.type.startsWith("image/")) {
+      if (!file.type || !file.type.startsWith("image/")) {
         return NextResponse.json(
           { error: "Csak kepfajlok tolthetők fel." },
           { status: 400 },
         );
       }
 
-      if (file.size > MAX_FILE_SIZE) {
+      if (!file.size || file.size > MAX_FILE_SIZE) {
         return NextResponse.json(
           { error: "Egy kep maximum 8MB lehet." },
           { status: 400 },
         );
       }
 
-      const fileName = safeFileName(file.name);
+      const fileName = safeFileName(file.name ?? "upload.jpg");
       const filePath = path.join(uploadDir, fileName);
       const bytes = await file.arrayBuffer();
       const buffer = Buffer.from(bytes);
@@ -69,8 +84,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ urls });
   } catch (error) {
     console.error("[admin/upload] hiba:", error);
+    const details = error instanceof Error ? error.message : "Ismeretlen hiba";
     return NextResponse.json(
-      { error: "Feltoltes sikertelen." },
+      { error: "Feltoltes sikertelen.", details },
       { status: 500 },
     );
   }
