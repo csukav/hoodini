@@ -140,9 +140,8 @@ export default function RootLayout({
                   <p className="label-xs text-stone-100 mb-5">Termékek</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      { name: "Hoodiék", href: "#" },
+                      { name: "HoodiE", href: "#" },
                       { name: "Pólók", href: "#" },
-                      { name: "Nadrágok", href: "#" },
                       { name: "Kiegészítők", href: "#" },
                       { name: "Sale", href: "#" },
                     ].map((item) => (
