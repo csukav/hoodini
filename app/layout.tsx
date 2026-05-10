@@ -64,7 +64,7 @@ export const metadata: Metadata = {
     googleBot: { index: true, follow: true, "max-image-preview": "large" },
   },
   // Google Search Console hitelesítés – cseréld ki a saját kódodra:
-   verification: { google: "bUAXV1LMsFSTTJaOmOr-LsbU-E-VqU3l31xbcuyHYjE" },
+  verification: { google: "bUAXV1LMsFSTTJaOmOr-LsbU-E-VqU3l31xbcuyHYjE" },
 };
 
 export default function RootLayout({
@@ -140,18 +140,18 @@ export default function RootLayout({
                   <p className="label-xs text-stone-100 mb-5">Termékek</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      "Hoodiék",
-                      "Pólók",
-                      "Nadrágok",
-                      "Kiegészítők",
-                      "Sale",
-                    ].map((l) => (
-                      <li key={l}>
+                      { name: "Hoodiék", href: "#" },
+                      { name: "Pólók", href: "#" },
+                      { name: "Nadrágok", href: "#" },
+                      { name: "Kiegészítők", href: "#" },
+                      { name: "Sale", href: "#" },
+                    ].map((item) => (
+                      <li key={item.name}>
                         <a
-                          href="#"
+                          href={item.href}
                           className="hover:text-stone-100 transition-colors"
                         >
-                          {l}
+                          {item.name}
                         </a>
                       </li>
                     ))}
@@ -160,35 +160,38 @@ export default function RootLayout({
                 <div>
                   <p className="label-xs text-stone-100 mb-5">Segítség</p>
                   <ul className="space-y-3 text-sm">
-                    {["GYIK", "Visszaküldés", "Szállítás", "Garancia"].map(
-                      (l) => (
-                        <li key={l}>
-                          <a
-                            href="#"
-                            className="hover:text-stone-100 transition-colors"
-                          >
-                            {l}
-                          </a>
-                        </li>
-                      ),
-                    )}
+                    {[
+                      { name: "GYIK", href: "/help" },
+                      { name: "Visszaküldés", href: "/returns" },
+                      { name: "Szállítás", href: "/shipping" },
+                      { name: "Garancia", href: "/warranty" },
+                    ].map((item) => (
+                      <li key={item.name}>
+                        <a
+                          href={item.href}
+                          className="hover:text-stone-100 transition-colors"
+                        >
+                          {item.name}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div>
                   <p className="label-xs text-stone-100 mb-5">Rólunk</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      "Történetünk",
-                      "Fenntarthatóság",
-                      "Kapcsolat",
-                      "Karrier",
-                    ].map((l) => (
-                      <li key={l}>
+                      { name: "Történetünk", href: "/about" },
+                      { name: "Fenntarthatóság", href: "/sustainability" },
+                      { name: "Kapcsolat", href: "/contact" },
+                      { name: "Karrier", href: "/careers" },
+                    ].map((item) => (
+                      <li key={item.name}>
                         <a
-                          href="#"
+                          href={item.href}
                           className="hover:text-stone-100 transition-colors"
                         >
-                          {l}
+                          {item.name}
                         </a>
                       </li>
                     ))}
@@ -197,18 +200,21 @@ export default function RootLayout({
                 <div>
                   <p className="label-xs text-stone-100 mb-5">Közösség</p>
                   <ul className="space-y-3 text-sm">
-                    {["Instagram", "TikTok", "Facebook", "Pinterest"].map(
-                      (l) => (
-                        <li key={l}>
-                          <a
-                            href="#"
-                            className="hover:text-stone-100 transition-colors"
-                          >
-                            {l}
-                          </a>
-                        </li>
-                      ),
-                    )}
+                    {[
+                      { name: "Instagram", href: "#" },
+                      { name: "TikTok", href: "#" },
+                      { name: "Facebook", href: "#" },
+                      { name: "Pinterest", href: "#" },
+                    ].map((item) => (
+                      <li key={item.name}>
+                        <a
+                          href={item.href}
+                          className="hover:text-stone-100 transition-colors"
+                        >
+                          {item.name}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
@@ -220,14 +226,14 @@ export default function RootLayout({
                 <p className="text-xs text-stone-600">
                   © 2026 Hoodini Kft. · Minden jog fenntartva ·{" "}
                   <a
-                    href="#"
+                    href="/privacy"
                     className="hover:text-stone-400 transition-colors"
                   >
                     Adatvédelem
                   </a>{" "}
                   &middot;{" "}
                   <a
-                    href="#"
+                    href="/aszf"
                     className="hover:text-stone-400 transition-colors"
                   >
                     ÁSZF
