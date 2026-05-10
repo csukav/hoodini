@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
+import crypto from "node:crypto";
 
 export const runtime = "nodejs";
 
 const MAX_FILES = 10;
 const MAX_FILE_SIZE = 8 * 1024 * 1024; // 8MB
+
+type CloudinaryConfig = {
+  cloudName: string;
+  apiKey: string;
+  apiSecret: string;
+};
 
 type UploadLike = {
   name?: string;
@@ -23,13 +28,55 @@ function isUploadLike(value: unknown): value is UploadLike {
   );
 }
 
-function safeFileName(original: string) {
-  const ext = path.extname(original).toLowerCase() || ".jpg";
-  const base = path
-    .basename(original, ext)
-    .replace(/[^a-zA-Z0-9-_]/g, "-")
-    .slice(0, 40);
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}-${base}${ext}`;
+function parseCloudinaryUrl(raw: string): CloudinaryConfig | null {
+  try {
+    const parsed = new URL(raw);
+    if (parsed.protocol !== "cloudinary:") return null;
+
+    const apiSecret = decodeURIComponent(parsed.password);
+    const apiKey = decodeURIComponent(parsed.username);
+    const cloudName = parsed.hostname;
+
+    if (!apiSecret || !apiKey || !cloudName) return null;
+    return { cloudName, apiKey, apiSecret };
+  } catch {
+    return null;
+  }
+}
+
+function getCloudinaryConfig(): CloudinaryConfig | null {
+  const urlValue =
+    process.env.CLOUDINARY_URL ??
+    process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+  if (urlValue) {
+    const parsed = parseCloudinaryUrl(urlValue);
+    if (parsed) return parsed;
+  }
+
+  const cloudName =
+    process.env.CLOUDINARY_CLOUD_NAME ??
+    process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const apiKey = process.env.CLOUDINARY_API_KEY;
+  const apiSecret = process.env.CLOUDINARY_API_SECRET;
+
+  if (cloudName && apiKey && apiSecret) {
+    return { cloudName, apiKey, apiSecret };
+  }
+
+  return null;
+}
+
+function buildSignature(params: Record<string, string>, apiSecret: string) {
+  const signaturePayload = Object.entries(params)
+    .filter(([, value]) => value !== "")
+    .sort(([left], [right]) => left.localeCompare(right))
+    .map(([key, value]) => `${key}=${value}`)
+    .join("&");
+
+  return crypto
+    .createHash("sha1")
+    .update(`${signaturePayload}${apiSecret}`)
+    .digest("hex");
 }
 
 export async function POST(req: NextRequest) {
@@ -52,10 +99,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const uploadDir = path.join(process.cwd(), "public", "uploads", "products");
-    await mkdir(uploadDir, { recursive: true });
+    const cloudinary = getCloudinaryConfig();
+    if (!cloudinary) {
+      return NextResponse.json(
+        {
+          error: "Cloudinary nincs konfigurálva.",
+          details:
+            "Adj meg CLOUDINARY_URL-t, vagy CLOUDINARY_CLOUD_NAME + CLOUDINARY_API_KEY + CLOUDINARY_API_SECRET értékeket.",
+        },
+        { status: 500 },
+      );
+    }
 
     const urls: string[] = [];
+    const folder = "hoodini/products";
 
     for (const file of files) {
       if (!file.type || !file.type.startsWith("image/")) {
@@ -72,13 +129,41 @@ export async function POST(req: NextRequest) {
         );
       }
 
-      const fileName = safeFileName(file.name ?? "upload.jpg");
-      const filePath = path.join(uploadDir, fileName);
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const signature = buildSignature(
+        { folder, timestamp },
+        cloudinary.apiSecret,
+      );
       const bytes = await file.arrayBuffer();
-      const buffer = Buffer.from(bytes);
+      const blob = new Blob([bytes], { type: file.type ?? "image/jpeg" });
 
-      await writeFile(filePath, buffer);
-      urls.push(`/uploads/products/${fileName}`);
+      const uploadForm = new FormData();
+      uploadForm.append("file", blob, file.name ?? "upload.jpg");
+      uploadForm.append("api_key", cloudinary.apiKey);
+      uploadForm.append("timestamp", timestamp);
+      uploadForm.append("folder", folder);
+      uploadForm.append("signature", signature);
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${cloudinary.cloudName}/image/upload`,
+        {
+          method: "POST",
+          body: uploadForm,
+        },
+      );
+
+      const payload = (await response.json()) as {
+        secure_url?: string;
+        error?: { message?: string };
+      };
+
+      if (!response.ok || !payload.secure_url) {
+        throw new Error(
+          payload.error?.message ?? "Cloudinary feltoltes sikertelen.",
+        );
+      }
+
+      urls.push(payload.secure_url);
     }
 
     return NextResponse.json({ urls });

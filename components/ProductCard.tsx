@@ -35,6 +35,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           href={`/products/${product.slug}`}
           tabIndex={0}
           aria-label={product.name}
+          className="absolute inset-0 block"
         >
           <Image
             src={product.image}

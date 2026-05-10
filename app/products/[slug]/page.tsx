@@ -40,6 +40,10 @@ export default async function ProductPage({ params }: Props) {
   const { slug } = await params;
   const product = await getProductBySlug(slug);
   if (!product) notFound();
+  const galleryImages =
+    product.images && product.images.length > 0
+      ? product.images
+      : [product.image];
 
   /* JSON-LD – sanitised to prevent script injection */
   const jsonLd = {
@@ -115,7 +119,11 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           {/* ── Product image ── */}
-          <ImageLightbox src={product.image} alt={product.name} />
+          <ImageLightbox
+            src={product.image}
+            images={galleryImages}
+            alt={product.name}
+          />
 
           {/* ── Product details ── */}
           <div className="flex flex-col">

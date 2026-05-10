@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CheckCircle2 } from "lucide-react";
 import { stripe } from "@/lib/stripe";
-import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 import GadsConversionEvent from "@/components/GadsConversionEvent";
 
 export const metadata: Metadata = {
@@ -31,19 +29,6 @@ export default async function CheckoutSuccessPage({
         // HUF has no decimal places in Stripe, so amount_total is already HUF
         conversionValue = session.amount_total ?? undefined;
         transactionId = session.metadata?.orderId ?? session.id;
-
-        // Update the order in Firestore
-        if (session.metadata?.orderId) {
-          const orderRef = doc(db, "orders", session.metadata.orderId);
-          const orderSnap = await getDoc(orderRef);
-          if (orderSnap.exists() && !orderSnap.data().stripeSessionId) {
-            await updateDoc(orderRef, {
-              status: "confirmed",
-              stripeSessionId: session.id,
-              updatedAt: serverTimestamp(),
-            });
-          }
-        }
       }
     } catch {
       // session not found – show generic success

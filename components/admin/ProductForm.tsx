@@ -2,8 +2,6 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { storage } from "@/lib/firebase";
 
 export interface ProductFormValues {
   name: string;
@@ -86,33 +84,31 @@ export default function ProductForm({
     setError(null);
     setUploading(true);
     try {
-      const uploadedUrls: string[] = [];
+      const response = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: (() => {
+          const formData = new FormData();
+          for (const file of Array.from(files)) {
+            formData.append("files", file);
+          }
+          return formData;
+        })(),
+      });
 
-      for (const file of Array.from(files)) {
-        if (!file.type.startsWith("image/")) {
-          throw new Error("Csak kepfajl toltheto fel.");
-        }
+      const payload = (await response.json()) as {
+        urls?: string[];
+        error?: string;
+        details?: string;
+      };
 
-        if (file.size > 8 * 1024 * 1024) {
-          throw new Error("Egy kep maximum 8MB lehet.");
-        }
-
-        const fileExt = file.name.includes(".")
-          ? (file.name.split(".").pop()?.toLowerCase() ?? "jpg")
-          : "jpg";
-        const fileName = `${Date.now()}-${crypto.randomUUID()}.${fileExt}`;
-        const fileRef = ref(storage, `products/${fileName}`);
-
-        await uploadBytes(fileRef, file, {
-          contentType: file.type,
-        });
-
-        const downloadUrl = await getDownloadURL(fileRef);
-        uploadedUrls.push(downloadUrl);
+      if (!response.ok || !payload.urls) {
+        throw new Error(
+          payload.details || payload.error || "Feltoltes sikertelen.",
+        );
       }
 
       setValues((v) => {
-        const images = [...v.images, ...uploadedUrls];
+        const images = [...v.images, ...payload.urls!];
         return {
           ...v,
           images,

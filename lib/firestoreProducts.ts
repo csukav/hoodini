@@ -16,6 +16,29 @@ import type { Product } from "@/types";
 
 const COL = "products";
 
+function isPermissionError(error: unknown) {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string" &&
+    ((error as { code: string }).code === "permission-denied" ||
+      (error as { code: string }).code === "unauthenticated")
+  );
+}
+
+function formatFirestoreWriteError(error: unknown) {
+  if (isPermissionError(error)) {
+    return new Error(
+      "A Firestore rules jelenleg nem engedik az admin mentest. Engedelyezd az authenticated admin write-okat a Firebase Console Firestore rules reszen.",
+    );
+  }
+
+  return error instanceof Error
+    ? error
+    : new Error("Ismeretlen Firestore hiba.");
+}
+
 function toProduct(id: string, data: DocumentData): Product {
   const image = data.image ?? "";
   const images = Array.isArray(data.images)
@@ -66,11 +89,15 @@ export type ProductInput = Omit<Product, "id">;
 
 /** Create a new product – returns the new document ID */
 export async function createProduct(data: ProductInput): Promise<string> {
-  const ref = await addDoc(collection(db, COL), {
-    ...data,
-    createdAt: serverTimestamp(),
-  });
-  return ref.id;
+  try {
+    const ref = await addDoc(collection(db, COL), {
+      ...data,
+      createdAt: serverTimestamp(),
+    });
+    return ref.id;
+  } catch (error) {
+    throw formatFirestoreWriteError(error);
+  }
 }
 
 /** Update an existing product */
@@ -78,10 +105,21 @@ export async function updateProduct(
   id: string,
   data: Partial<ProductInput>,
 ): Promise<void> {
-  await updateDoc(doc(db, COL, id), { ...data, updatedAt: serverTimestamp() });
+  try {
+    await updateDoc(doc(db, COL, id), {
+      ...data,
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    throw formatFirestoreWriteError(error);
+  }
 }
 
 /** Delete a product */
 export async function deleteProduct(id: string): Promise<void> {
-  await deleteDoc(doc(db, COL, id));
+  try {
+    await deleteDoc(doc(db, COL, id));
+  } catch (error) {
+    throw formatFirestoreWriteError(error);
+  }
 }
