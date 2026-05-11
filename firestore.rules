@@ -1,0 +1,38 @@
+    rules_version = '2';
+
+    service cloud.firestore {
+    match /databases/{database}/documents {
+        // Admin authentication check
+        function isAuthenticated() {
+        return request.auth != null;
+        }
+
+        // Check if user email is in admins collection
+        function isAdmin() {
+        return isAuthenticated() &&
+            exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+        }
+
+        // Products collection - readable by all, writable by admins
+        match /products/{document=**} {
+        allow read: if true;
+        allow write: if isAdmin();
+        }
+
+        // Orders collection - readable and writable by admins
+        match /orders/{document=**} {
+        allow read, write: if isAdmin();
+        }
+
+        // Coupons collection - TEMPORARILY allow all operations for testing
+        match /coupons/{document=**} {
+        allow read, write: if true;
+        }
+
+        // Admins collection - only for checking auth
+        match /admins/{document=**} {
+        allow read: if isAuthenticated() && request.auth.uid == document;
+        allow write: if false;
+        }
+    }
+    }
