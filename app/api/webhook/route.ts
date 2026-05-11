@@ -32,6 +32,7 @@ function buildEmailHtml(order: Order): string {
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;">
           ${item.image ? `<img src="${item.image}" alt="${item.productName}" width="56" height="56" style="object-fit:cover;border-radius:4px;vertical-align:middle;margin-right:12px;" />` : ""}
           <span style="font-weight:600;">${item.productName}</span>
+          ${item.size ? `<span style="display:block;color:#6b7280;font-size:12px;margin-top:4px;">Méret: ${item.size}</span>` : ""}
         </td>
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;text-align:center;color:#78716c;">${item.quantity} db</td>
         <td style="padding:10px 0;border-bottom:1px solid #e7e5e4;text-align:right;font-weight:600;">${formatPrice(item.price * item.quantity)}</td>
@@ -84,10 +85,14 @@ function buildEmailHtml(order: Order): string {
                 <td style="color:#78716c;font-size:14px;padding:4px 0;">Szállítás</td>
                 <td style="text-align:right;font-size:14px;${order.shippingCost === 0 ? "color:#16a34a;" : "color:#44403c;"}padding:4px 0;">${order.shippingCost === 0 ? "Ingyenes" : formatPrice(order.shippingCost)}</td>
               </tr>
-              ${order.discountAmount ? `<tr>
+              ${
+                order.discountAmount
+                  ? `<tr>
                 <td style="color:#16a34a;font-size:14px;padding:4px 0;">Kupon: <strong>${order.couponCode}</strong></td>
                 <td style="text-align:right;font-size:14px;color:#16a34a;padding:4px 0;">-${formatPrice(order.discountAmount)}</td>
-              </tr>` : ""}
+              </tr>`
+                  : ""
+              }
               <tr>
                 <td style="font-size:16px;font-weight:800;color:#0c0a09;padding-top:12px;border-top:2px solid #e7e5e4;">Végösszeg</td>
                 <td style="text-align:right;font-size:16px;font-weight:800;color:#0c0a09;padding-top:12px;border-top:2px solid #e7e5e4;">${formatPrice(order.total)}</td>

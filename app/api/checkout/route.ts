@@ -12,7 +12,14 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { customer, shippingAddress, items, note, couponCode, discountAmount } = body as {
+    const {
+      customer,
+      shippingAddress,
+      items,
+      note,
+      couponCode,
+      discountAmount,
+    } = body as {
       customer: { name: string; email: string; phone: string };
       shippingAddress: { zip: string; city: string; address: string };
       items: OrderItem[];
@@ -48,7 +55,7 @@ export async function POST(req: NextRequest) {
       price_data: {
         currency: "huf",
         product_data: {
-          name: item.productName,
+          name: `${item.productName}${item.size ? ` (${item.size})` : ""}`,
           ...(item.image ? { images: [item.image] } : {}),
         },
         unit_amount: item.price * 100,

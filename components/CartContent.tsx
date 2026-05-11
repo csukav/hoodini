@@ -54,7 +54,10 @@ export default function CartContent() {
           <div className="border border-stone-200 bg-white px-4 sm:px-6 py-2">
             <ul aria-label="Kosárban lévő termékek">
               {items.map((item) => (
-                <CartItemRow key={item.product.id} item={item} />
+                <CartItemRow
+                  key={`${item.product.id}-${item.size ?? "default"}`}
+                  item={item}
+                />
               ))}
             </ul>
           </div>

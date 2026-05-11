@@ -28,6 +28,7 @@ function toProduct(id: string, data: DocumentData): Product {
     stock: data.stock ?? 0,
     rating: data.rating ?? 0,
     reviewCount: data.reviewCount ?? 0,
+    sizes: data.sizes ?? ["XS", "S", "M", "L", "XL", "XXL"],
   };
 }
 

@@ -12,7 +12,7 @@ interface CartItemRowProps {
 
 export default function CartItemRow({ item }: CartItemRowProps) {
   const { updateQuantity, removeFromCart } = useCart();
-  const { product, quantity } = item;
+  const { product, quantity, size } = item;
 
   return (
     <li className="flex gap-4 py-5 border-b border-stone-200 last:border-0">
@@ -35,6 +35,11 @@ export default function CartItemRow({ item }: CartItemRowProps) {
         <h3 className="font-semibold text-stone-950 text-sm mt-0.5 line-clamp-2">
           {product.name}
         </h3>
+        {size ? (
+          <p className="text-xs uppercase tracking-[0.18em] text-stone-500 mt-1">
+            Méret: {size}
+          </p>
+        ) : null}
         <p className="text-sm font-bold text-stone-600 mt-1">
           {formatPrice(product.price)}
         </p>
@@ -48,7 +53,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
             aria-label="Mennyiség"
           >
             <button
-              onClick={() => updateQuantity(product.id, quantity - 1)}
+              onClick={() => updateQuantity(product.id, size, quantity - 1)}
               className="p-2 hover:bg-stone-50 transition-colors text-stone-400 hover:text-stone-900"
               aria-label="Mennyiség csökkentése"
             >
@@ -61,7 +66,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
               {quantity}
             </span>
             <button
-              onClick={() => updateQuantity(product.id, quantity + 1)}
+              onClick={() => updateQuantity(product.id, size, quantity + 1)}
               className="p-2 hover:bg-stone-50 transition-colors text-stone-400 hover:text-stone-900"
               aria-label="Mennyiség növelése"
             >
@@ -71,7 +76,7 @@ export default function CartItemRow({ item }: CartItemRowProps) {
 
           {/* Remove */}
           <button
-            onClick={() => removeFromCart(product.id)}
+            onClick={() => removeFromCart(product.id, size)}
             className="p-2 text-stone-300 hover:text-red-500 transition-colors"
             aria-label={`${product.name} eltávolítása a kosárból`}
           >

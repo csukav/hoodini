@@ -150,8 +150,13 @@ function OrderRow({
               {order.items.map((item, i) => (
                 <li key={i} className="flex justify-between text-sm">
                   <span className="text-stone-700">
-                    {item.productName}{" "}
-                    <span className="text-stone-400">× {item.quantity}</span>
+                    {item.productName}
+                    {item.size ? (
+                      <span className="text-xs uppercase tracking-[0.18em] text-stone-400 ml-2">
+                        Méret: {item.size}
+                      </span>
+                    ) : null}
+                    <span className="text-stone-400"> × {item.quantity}</span>
                   </span>
                   <span className="font-semibold text-stone-900">
                     {formatPrice(item.price * item.quantity)}
@@ -174,7 +179,9 @@ function OrderRow({
               </div>
               {order.discountAmount && (
                 <div className="flex justify-between text-emerald-600">
-                  <span>Kupon: <strong>{order.couponCode}</strong></span>
+                  <span>
+                    Kupon: <strong>{order.couponCode}</strong>
+                  </span>
                   <span>-{formatPrice(order.discountAmount)}</span>
                 </div>
               )}

@@ -83,6 +83,8 @@ export default async function ProductPage({ params }: Props) {
     { icon: Package, title: "Ingyenes szállítás", desc: "15 000 Ft felett" },
   ];
 
+  const availableSizes = product.sizes ?? ["XS", "S", "M", "L", "XL", "XXL"];
+
   return (
     <>
       {/* Structured data */}
@@ -178,7 +180,10 @@ export default async function ProductPage({ params }: Props) {
 
             {/* Add to cart */}
             <div className="mt-8">
-              <AddToCartButton product={product} />
+              <AddToCartButton
+                product={product}
+                availableSizes={availableSizes}
+              />
             </div>
 
             {/* Description */}
