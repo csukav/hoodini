@@ -23,7 +23,9 @@ export default function NewCouponPage() {
     minOrderValue: "",
   });
 
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  type CouponErrors = Record<string, string | undefined>;
+
+  const [errors, setErrors] = useState<CouponErrors>({});
   const [saving, setSaving] = useState(false);
   const [serverError, setServerError] = useState("");
 
@@ -34,7 +36,7 @@ export default function NewCouponPage() {
   }, [user, loading, router]);
 
   function validate() {
-    const e: Record<string, string> = {};
+    const e: CouponErrors = {};
 
     if (!form.code.trim()) e.code = "Kötelező mező.";
     else if (form.code.length < 3) e.code = "Legalább 3 karakter szükséges.";
