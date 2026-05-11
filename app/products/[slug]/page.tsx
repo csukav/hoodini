@@ -74,7 +74,7 @@ export default async function ProductPage({ params }: Props) {
     .replace(/&/g, "\\u0026");
 
   const benefits = [
-    { icon: Truck, title: "Gyors kiszállítás", desc: "1–3 munkanap" },
+    { icon: Truck, title: "Gyors kiszállítás", desc: "4-6 munkanap" },
     {
       icon: RotateCcw,
       title: "30 napos visszaküldés",
