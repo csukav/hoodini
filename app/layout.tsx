@@ -140,7 +140,7 @@ export default function RootLayout({
                   <p className="label-xs text-stone-100 mb-5">Termékek</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      "Hoodiék",
+                      "Hoodie",
                       "Pólók",
                       "Nadrágok",
                       "Kiegészítők",
