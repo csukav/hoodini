@@ -172,6 +172,12 @@ function OrderRow({
                     : formatPrice(order.shippingCost)}
                 </span>
               </div>
+              {order.discountAmount && (
+                <div className="flex justify-between text-emerald-600">
+                  <span>Kupon: <strong>{order.couponCode}</strong></span>
+                  <span>-{formatPrice(order.discountAmount)}</span>
+                </div>
+              )}
               <div className="flex justify-between font-bold text-stone-900 pt-1 border-t border-stone-200">
                 <span>Végösszeg</span>
                 <span>{formatPrice(order.total)}</span>
@@ -287,6 +293,12 @@ export default function AdminOrdersPage() {
             >
               <ArrowLeft className="w-3.5 h-3.5" />
               Termékek
+            </Link>
+            <Link
+              href="/admin/coupons"
+              className="border border-stone-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-stone-600 hover:bg-stone-100"
+            >
+              Kuponok
             </Link>
             <button
               onClick={handleSignOut}

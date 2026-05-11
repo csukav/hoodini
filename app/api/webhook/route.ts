@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import nodemailer from "nodemailer";
 import { stripe } from "@/lib/stripe";
 import { getOrderById } from "@/lib/firestoreOrders";
+import { getCouponByCode, incrementCouponUsage } from "@/lib/firestoreCoupons";
 import type { Order } from "@/types";
 import { doc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -83,6 +84,10 @@ function buildEmailHtml(order: Order): string {
                 <td style="color:#78716c;font-size:14px;padding:4px 0;">Szállítás</td>
                 <td style="text-align:right;font-size:14px;${order.shippingCost === 0 ? "color:#16a34a;" : "color:#44403c;"}padding:4px 0;">${order.shippingCost === 0 ? "Ingyenes" : formatPrice(order.shippingCost)}</td>
               </tr>
+              ${order.discountAmount ? `<tr>
+                <td style="color:#16a34a;font-size:14px;padding:4px 0;">Kupon: <strong>${order.couponCode}</strong></td>
+                <td style="text-align:right;font-size:14px;color:#16a34a;padding:4px 0;">-${formatPrice(order.discountAmount)}</td>
+              </tr>` : ""}
               <tr>
                 <td style="font-size:16px;font-weight:800;color:#0c0a09;padding-top:12px;border-top:2px solid #e7e5e4;">Végösszeg</td>
                 <td style="text-align:right;font-size:16px;font-weight:800;color:#0c0a09;padding-top:12px;border-top:2px solid #e7e5e4;">${formatPrice(order.total)}</td>
@@ -149,6 +154,19 @@ export async function POST(req: NextRequest) {
       stripeSessionId: session.id,
       updatedAt: serverTimestamp(),
     });
+
+    // Increment coupon usage if applied
+    const couponCode = session.metadata?.couponCode;
+    if (couponCode) {
+      try {
+        const coupon = await getCouponByCode(couponCode);
+        if (coupon) {
+          await incrementCouponUsage(coupon.id);
+        }
+      } catch (err) {
+        console.error("Error incrementing coupon usage:", err);
+      }
+    }
 
     // Fetch the full order for the email
     const order = await getOrderById(orderId);

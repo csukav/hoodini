@@ -44,6 +44,7 @@ export default function ImageLightbox({ src, alt }: Props) {
           alt={alt}
           fill
           priority
+          loading="eager"
           sizes="(max-width: 1024px) 100vw, 50vw"
           className="object-cover transition-transform duration-300 group-hover:scale-105"
         />

@@ -40,6 +40,8 @@ function toOrder(id: string, data: DocumentData): Order {
     total: data.total ?? 0,
     note: data.note ?? "",
     stripeSessionId: data.stripeSessionId ?? undefined,
+    couponCode: data.couponCode ?? undefined,
+    discountAmount: data.discountAmount ?? undefined,
   };
 }
 

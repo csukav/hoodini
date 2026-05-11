@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { stripe } from "@/lib/stripe";
 import { createOrder } from "@/lib/firestoreOrders";
+import { incrementCouponUsage } from "@/lib/firestoreCoupons";
 import type { OrderInput } from "@/lib/firestoreOrders";
 import type { OrderItem } from "@/types";
 
@@ -11,11 +12,13 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { customer, shippingAddress, items, note } = body as {
+    const { customer, shippingAddress, items, note, couponCode, discountAmount } = body as {
       customer: { name: string; email: string; phone: string };
       shippingAddress: { zip: string; city: string; address: string };
       items: OrderItem[];
       note?: string;
+      couponCode?: string;
+      discountAmount?: number;
     };
 
     if (
@@ -38,6 +41,8 @@ export async function POST(req: NextRequest) {
       0,
     );
     const shippingCost = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+    const discount = discountAmount || 0;
+    const total = subtotal + shippingCost - discount;
 
     const lineItems = items.map((item) => ({
       price_data: {
@@ -63,6 +68,18 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // Add discount as a negative line item if applied
+    if (discount > 0) {
+      lineItems.push({
+        price_data: {
+          currency: "huf",
+          product_data: { name: `Kupon: ${couponCode}` },
+          unit_amount: -discount * 100,
+        },
+        quantity: 1,
+      });
+    }
+
     const origin = req.nextUrl.origin;
 
     // Create order in Firestore immediately (pending status)
@@ -73,8 +90,10 @@ export async function POST(req: NextRequest) {
       items,
       subtotal,
       shippingCost,
-      total: subtotal + shippingCost,
+      total,
       note: note ?? "",
+      couponCode: couponCode || undefined,
+      discountAmount: discount || undefined,
     };
     const orderId = await createOrder(orderInput);
 
@@ -85,6 +104,7 @@ export async function POST(req: NextRequest) {
       line_items: lineItems,
       metadata: {
         orderId,
+        couponCode: couponCode || "",
       },
       success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/checkout`,

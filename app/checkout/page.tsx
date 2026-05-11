@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck, Package } from "lucide-react";
+import { ArrowLeft, ShieldCheck, Package, X, Check } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
-import type { OrderItem } from "@/types";
+import type { OrderItem, Coupon } from "@/types";
 
 const SHIPPING_THRESHOLD = 15_000;
 const SHIPPING_COST = 0;
@@ -16,7 +16,6 @@ export default function CheckoutPage() {
   const { items, totalPrice, totalItems, clearCart } = useCart();
 
   const shippingCost = totalPrice >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-  const grandTotal = totalPrice + shippingCost;
 
   const [form, setForm] = useState({
     name: "",
@@ -30,6 +29,69 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<Partial<typeof form>>({});
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{
+    id: string;
+    code: string;
+    discountAmount: number;
+    discountType: string;
+    discountValue: number;
+  } | null>(null);
+  const [couponLoading, setCouponLoading] = useState(false);
+  const [couponError, setCouponError] = useState("");
+
+  const discountAmount = appliedCoupon?.discountAmount || 0;
+  const grandTotal = totalPrice + shippingCost - discountAmount;
+
+  async function applyCoupon() {
+    if (!couponCode.trim()) {
+      setCouponError("Kupon kód szükséges.");
+      return;
+    }
+
+    setCouponLoading(true);
+    setCouponError("");
+    setAppliedCoupon(null);
+
+    try {
+      const res = await fetch("/api/coupons", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: couponCode.trim(),
+          orderTotal: totalPrice + shippingCost,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setCouponError(data.error || "Ismeretlen hiba.");
+        return;
+      }
+
+      setAppliedCoupon({
+        id: data.couponId,
+        code: data.code,
+        discountAmount: data.discountAmount,
+        discountType: data.discountType,
+        discountValue: data.discountValue,
+      });
+      setCouponCode("");
+    } catch (error) {
+      setCouponError("Hálózati hiba. Próbáld újra.");
+      console.error(error);
+    } finally {
+      setCouponLoading(false);
+    }
+  }
+
+  function removeCoupon() {
+    setAppliedCoupon(null);
+    setCouponCode("");
+    setCouponError("");
+  }
 
   function validate() {
     const e: Partial<typeof form> = {};
@@ -87,6 +149,8 @@ export default function CheckoutPage() {
           },
           items: orderItems,
           note: form.note.trim(),
+          couponCode: appliedCoupon?.code || undefined,
+          discountAmount: appliedCoupon?.discountAmount || 0,
         }),
       });
 
@@ -294,6 +358,14 @@ export default function CheckoutPage() {
                       : formatPrice(shippingCost)}
                   </dd>
                 </div>
+                {appliedCoupon && (
+                  <div className="flex justify-between text-emerald-600">
+                    <dt>Kupon ({appliedCoupon.code})</dt>
+                    <dd className="font-medium">
+                      -{formatPrice(appliedCoupon.discountAmount)}
+                    </dd>
+                  </div>
+                )}
                 <div className="flex justify-between items-baseline pt-3 border-t border-stone-200">
                   <span className="font-bold text-stone-950">Végösszeg</span>
                   <span className="text-xl font-black text-stone-950">
@@ -301,6 +373,63 @@ export default function CheckoutPage() {
                   </span>
                 </div>
               </dl>
+
+              {/* Coupon section */}
+              <div className="mt-5 pt-5 border-t border-stone-200">
+                {appliedCoupon ? (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded p-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4 text-emerald-600" />
+                      <div>
+                        <p className="text-xs font-semibold text-emerald-900">
+                          {appliedCoupon.code}
+                        </p>
+                        <p className="text-xs text-emerald-700">
+                          {appliedCoupon.discountType === "percentage"
+                            ? `${appliedCoupon.discountValue}% kedvezmény`
+                            : `${formatPrice(appliedCoupon.discountValue)} Ft kedvezmény`}
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeCoupon}
+                      className="text-emerald-600 hover:text-emerald-700"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <label className="text-xs font-semibold uppercase tracking-widest text-stone-500">
+                      Kupon kód (opcionális)
+                    </label>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={couponCode}
+                        onChange={(e) => {
+                          setCouponCode(e.target.value);
+                          setCouponError("");
+                        }}
+                        placeholder="Kupon kód beírása"
+                        className="flex-1 border border-stone-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-stone-800"
+                      />
+                      <button
+                        type="button"
+                        onClick={applyCoupon}
+                        disabled={couponLoading || !couponCode.trim()}
+                        className="bg-stone-900 text-white px-4 py-2 text-sm font-semibold hover:bg-stone-700 disabled:opacity-50"
+                      >
+                        {couponLoading ? "..." : "Érvényesítés"}
+                      </button>
+                    </div>
+                    {couponError && (
+                      <p className="text-xs text-red-600">{couponError}</p>
+                    )}
+                  </div>
+                )}
+              </div>
 
               {serverError && (
                 <p className="mt-4 text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2">

@@ -75,6 +75,12 @@ export default function AdminDashboardPage() {
               Rendelések
             </Link>
             <Link
+              href="/admin/coupons"
+              className="border border-stone-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-stone-600 hover:bg-stone-100"
+            >
+              Kuponok
+            </Link>
+            <Link
               href="/admin/products/new"
               className="bg-stone-900 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-white hover:bg-stone-700"
             >
@@ -143,6 +149,7 @@ export default function AdminDashboardPage() {
                       fill
                       className="object-cover transition group-hover:scale-105"
                       sizes="(max-width:640px) 50vw, (max-width:1024px) 33vw, 25vw"
+                      loading="eager"
                     />
                   ) : (
                     <div className="flex h-full items-center justify-center text-stone-300 text-xs">

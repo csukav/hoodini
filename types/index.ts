@@ -51,4 +51,20 @@ export interface Order {
   total: number;
   note?: string;
   stripeSessionId?: string;
+  couponCode?: string;
+  discountAmount?: number;
+}
+
+export interface Coupon {
+  id: string;
+  code: string;
+  description: string;
+  discountType: "percentage" | "fixed";
+  discountValue: number;
+  maxUsageCount?: number;
+  currentUsageCount: number;
+  expiresAt?: Date;
+  isActive: boolean;
+  createdAt: Date;
+  minOrderValue?: number;
 }
