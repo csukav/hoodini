@@ -140,18 +140,18 @@ export default function RootLayout({
                   <p className="label-xs text-stone-100 mb-5">Termékek</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      "Hoodie",
-                      "Pólók",
-                      "Nadrágok",
-                      "Kiegészítők",
-                      "Sale",
+                      { label: "Hoodie", href: "/products" },
+                      { label: "Pólók", href: "/products" },
+                      { label: "Nadrágok", href: "/products" },
+                      { label: "Kiegészítők", href: "/products" },
+                      { label: "Sale", href: "/products" },
                     ].map((l) => (
-                      <li key={l}>
+                      <li key={l.label}>
                         <a
-                          href="#"
+                          href={l.href}
                           className="hover:text-stone-100 transition-colors"
                         >
-                          {l}
+                          {l.label}
                         </a>
                       </li>
                     ))}
@@ -160,35 +160,38 @@ export default function RootLayout({
                 <div>
                   <p className="label-xs text-stone-100 mb-5">Segítség</p>
                   <ul className="space-y-3 text-sm">
-                    {["GYIK", "Visszaküldés", "Szállítás", "Garancia"].map(
-                      (l) => (
-                        <li key={l}>
-                          <a
-                            href="#"
-                            className="hover:text-stone-100 transition-colors"
-                          >
-                            {l}
-                          </a>
-                        </li>
-                      ),
-                    )}
+                    {[
+                      { label: "GYIK", href: "/help" },
+                      { label: "Visszaküldés", href: "/visszakuldes" },
+                      { label: "Szállítás", href: "/szallitas" },
+                      { label: "Garancia", href: "/garancia" },
+                    ].map((l) => (
+                      <li key={l.label}>
+                        <a
+                          href={l.href}
+                          className="hover:text-stone-100 transition-colors"
+                        >
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 <div>
                   <p className="label-xs text-stone-100 mb-5">Rólunk</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      "Történetünk",
-                      "Fenntarthatóság",
-                      "Kapcsolat",
-                      "Karrier",
+                      { label: "Történetünk", href: "/tortenetunk" },
+                      { label: "Fenntarthatóság", href: "/fenntarthatosag" },
+                      { label: "Kapcsolat", href: "/kapcsolat" },
+                      { label: "Karrier", href: "/karrier" },
                     ].map((l) => (
-                      <li key={l}>
+                      <li key={l.label}>
                         <a
-                          href="#"
+                          href={l.href}
                           className="hover:text-stone-100 transition-colors"
                         >
-                          {l}
+                          {l.label}
                         </a>
                       </li>
                     ))}
