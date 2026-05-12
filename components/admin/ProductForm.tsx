@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { X, Upload } from "lucide-react";
 
 export interface ProductFormValues {
   name: string;
@@ -10,6 +11,7 @@ export interface ProductFormValues {
   category: string;
   stock: number;
   image: string;
+  images?: string[];
   description: string;
   rating: number;
   reviewCount: number;
@@ -45,18 +47,20 @@ export default function ProductForm({
     category: initial.category ?? "",
     stock: initial.stock ?? 0,
     image: initial.image ?? "",
+    images: initial.images ?? [],
     description: initial.description ?? "",
     rating: initial.rating ?? 0,
     reviewCount: initial.reviewCount ?? 0,
   });
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   function handleNameChange(name: string) {
     setValues((v) => ({
       ...v,
       name,
-      // Auto-generate slug only if slug was empty / unchanged from previous auto-slug
       slug:
         v.slug === slugify(v.name) || v.slug === "" ? slugify(name) : v.slug,
     }));
@@ -69,53 +73,77 @@ export default function ProductForm({
     setValues((v) => ({ ...v, [key]: val }));
   }
 
-  // Try to convert an imgur page URL to a direct image URL.
-  // imgur.com/IMAGEID  →  https://i.imgur.com/IMAGEID.jpg
-  // imgur.com/a/ALBUM  →  cannot convert (album), returns null
-  function convertImgurUrl(raw: string): string | null {
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+
+    setUploading(true);
+    setError(null);
+
     try {
-      const url = new URL(raw);
-      if (url.hostname === "imgur.com" || url.hostname === "www.imgur.com") {
-        // Album or gallery — can't auto-convert
-        if (
-          url.pathname.startsWith("/a/") ||
-          url.pathname.startsWith("/gallery/")
-        ) {
-          return null;
+      const newImages: string[] = [...(values.images ?? [])];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await fetch("/api/admin/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        if (!response.ok) {
+          const data = await response.json();
+          throw new Error(data.error || "Feltöltési hiba");
         }
-        // Single image: /IMAGEID or /IMAGEID.ext
-        const id = url.pathname.replace(/^\//, "").split(".")[0];
-        if (id) return `https://i.imgur.com/${id}.jpg`;
+
+        const data = await response.json();
+        newImages.push(data.url);
       }
-    } catch {
-      // not a valid URL yet, ignore
+
+      setValues((v) => {
+        const updatedImages = newImages;
+        return {
+          ...v,
+          images: updatedImages,
+          // Set first image as main image if not set
+          image: v.image || updatedImages[0] || "",
+        };
+      });
+
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    } catch (err) {
+      console.error("[ProductForm] Feltöltési hiba:", err);
+      const msg = err instanceof Error ? err.message : "Ismeretlen hiba";
+      setError(`Képfeltöltés sikertelen: ${msg}`);
+    } finally {
+      setUploading(false);
     }
-    return raw;
   }
 
-  function imgurWarning(url: string): string | null {
-    if (!url) return null;
-    try {
-      const u = new URL(url);
-      if (u.hostname === "imgur.com" || u.hostname === "www.imgur.com") {
-        if (
-          u.pathname.startsWith("/a/") ||
-          u.pathname.startsWith("/gallery/")
-        ) {
-          return "album";
-        }
-        return "page";
-      }
-      if (u.hostname === "i.imgur.com") return null; // correct
-    } catch {
-      /* ignore */
-    }
-    return null;
+  function removeImage(index: number) {
+    setValues((v) => {
+      const updatedImages = (v.images ?? []).filter((_, i) => i !== index);
+      return {
+        ...v,
+        images: updatedImages,
+        // If we removed the main image, set the first remaining as main
+        image: v.image === (v.images ?? [])[index] 
+          ? updatedImages[0] || "" 
+          : v.image,
+      };
+    });
   }
 
-  function handleImageChange(raw: string) {
-    const converted = convertImgurUrl(raw);
-    set("image", converted ?? raw);
+  function setMainImage(index: number) {
+    const images = values.images ?? [];
+    if (images[index]) {
+      set("image", images[index]);
+    }
   }
 
   async function handleSubmit(e: FormEvent) {
@@ -128,7 +156,6 @@ export default function ProductForm({
     } catch (err) {
       console.error("[ProductForm] mentési hiba:", err);
       const msg = err instanceof Error ? err.message : "Ismeretlen hiba.";
-      // Surface a friendly message for common Firebase misconfig
       if (
         msg.includes("projectId") ||
         msg.includes("invalid-argument") ||
@@ -217,52 +244,95 @@ export default function ProductForm({
         </select>
       </div>
 
-      {/* Image URL */}
+      {/* Image Upload - Cloudinary */}
       <div>
-        <label className={labelClass}>Kép URL</label>
-        <input
-          type="text"
-          value={values.image}
-          onChange={(e) => handleImageChange(e.target.value)}
-          placeholder="https://i.imgur.com/IMAGEID.jpg"
-          className={fieldClass}
-        />
+        <label className={labelClass}>Termék képek (Cloudinary)</label>
+        <div className="rounded border-2 border-dashed border-stone-300 bg-stone-50 p-6 text-center">
+          <Upload className="mx-auto mb-2 h-8 w-8 text-stone-400" />
+          <p className="mb-3 text-sm text-stone-600">
+            Kattints a képek kiválasztásához vagy húzd ide őket
+          </p>
+          <input
+            ref={fileInputRef}
+            type="file"
+            multiple
+            accept="image/*"
+            onChange={handleFileUpload}
+            disabled={uploading}
+            className="hidden"
+            id="image-upload"
+          />
+          <label htmlFor="image-upload">
+            <button
+              type="button"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded bg-stone-900 px-4 py-2 text-sm font-semibold text-white hover:bg-stone-700 disabled:opacity-50"
+            >
+              {uploading ? "Feltöltés..." : "Képek kiválasztása"}
+            </button>
+          </label>
+          <p className="mt-2 text-xs text-stone-500">
+            PNG, JPG, WebP – max 5MB per kép
+          </p>
+        </div>
 
-        {/* Imgur guidance */}
-        {imgurWarning(values.image) === "album" && (
-          <div className="mt-2 rounded border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800 leading-relaxed">
-            <strong>Ez egy imgur album link – nem tud betölteni.</strong>
-            <br />
-            Nyisd meg az albumot, kattints az egyik képre, majd{" "}
-            <strong>jobb klikk → Kép másolása hivatkozásként</strong>. Az így
-            kapott link{" "}
-            <code className="rounded bg-amber-100 px-1">
-              i.imgur.com/IMAGEID.jpg
-            </code>{" "}
-            formátumú lesz – azt illeszd be ide.
+        {/* Uploaded Images Preview */}
+        {(values.images ?? []).length > 0 && (
+          <div className="mt-4">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-stone-600">
+              Feltöltött képek ({values.images?.length})
+            </p>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {values.images?.map((url, idx) => (
+                <div key={idx} className="relative group">
+                  <img
+                    src={url}
+                    alt={`Termékkép ${idx + 1}`}
+                    className={`h-24 w-full rounded object-cover ${
+                      values.image === url ? "ring-2 ring-stone-900" : ""
+                    }`}
+                  />
+
+                  {/* Main image indicator */}
+                  {values.image === url && (
+                    <span className="absolute bottom-1 left-1 bg-stone-900 px-2 py-1 text-xs font-semibold text-white rounded">
+                      Fő kép
+                    </span>
+                  )}
+
+                  {/* Hover actions */}
+                  <div className="absolute inset-0 hidden rounded bg-black/50 group-hover:flex items-center justify-center gap-2">
+                    {values.image !== url && (
+                      <button
+                        type="button"
+                        onClick={() => setMainImage(idx)}
+                        className="rounded bg-white px-2 py-1 text-xs font-semibold text-stone-900 hover:bg-stone-100"
+                        title="Fő képként beállítás"
+                      >
+                        Fő
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removeImage(idx)}
+                      className="rounded bg-red-600 p-1 text-white hover:bg-red-700"
+                      title="Kép törlése"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
-        {/* Correct i.imgur.com or other domain — show preview */}
-        {values.image && imgurWarning(values.image) !== "album" && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={values.image}
-            alt="Előnézet"
-            className="mt-2 h-32 w-auto rounded object-cover"
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = "none";
-            }}
-          />
+        {!values.images?.length && (
+          <p className="mt-2 text-xs text-stone-400">
+            Még nincs feltöltött kép. Feltölts néhány képet a termékhez!
+          </p>
         )}
-
-        <p className="mt-1 text-xs text-stone-400">
-          Imgur esetén mindig{" "}
-          <code className="rounded bg-stone-100 px-1">
-            i.imgur.com/IMAGEID.jpg
-          </code>{" "}
-          formátumú közvetlen linket használj (nem album, nem oldal-link).
-        </p>
       </div>
 
       {/* Description */}
@@ -312,7 +382,7 @@ export default function ProductForm({
         <div className="flex gap-3">
           <button
             type="submit"
-            disabled={saving}
+            disabled={saving || uploading}
             className="bg-stone-900 px-6 py-2.5 text-sm font-semibold uppercase tracking-widest text-white hover:bg-stone-700 disabled:opacity-50"
           >
             {saving ? "Mentés..." : submitLabel}

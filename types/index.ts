@@ -3,7 +3,8 @@ export interface Product {
   slug: string;
   name: string;
   price: number;
-  image: string;
+  image: string; // First image (for backward compatibility)
+  images?: string[]; // Array of all product images
   description: string;
   category: string;
   stock: number;
