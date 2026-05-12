@@ -93,12 +93,23 @@ export default function ProductForm({
           body: formData,
         });
 
+        const text = await response.text();
+        let data: { url?: string; error?: string } = {};
+
+        try {
+          data = text ? JSON.parse(text) : {};
+        } catch (parseError) {
+          throw new Error(`Hibás szerver válasz: ${text}`);
+        }
+
         if (!response.ok) {
-          const data = await response.json();
           throw new Error(data.error || "Feltöltési hiba");
         }
 
-        const data = await response.json();
+        if (!data.url) {
+          throw new Error("A feltöltés nem adott vissza kép URL-t.");
+        }
+
         newImages.push(data.url);
       }
 
