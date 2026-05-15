@@ -42,31 +42,120 @@ export default async function ProductPage({ params }: Props) {
   if (!product) notFound();
 
   /* JSON-LD – sanitised to prevent script injection */
-  const jsonLd = {
-    "@context": "https://schema.org",
+  const balaclavaJsonLd = {
+    "@context": "https://schema.org/",
     "@type": "Product",
-    name: product.name,
-    description: product.description,
-    image: product.image,
-    sku: product.id,
-    brand: { "@type": "Brand", name: "Hoodini" },
+    name: "Balaclava Hoodie",
+    description:
+      "HOODINI Urban Stealth – Full-Zip Balaclava Hoodie. Beépített balaclava maszk, full-zip megoldás. Pamut-poliészter keverék.",
+    image: [
+      "https://res.cloudinary.com/dww6rbqwb/image/upload/v1778586774/hoodini-products/pumsd1bazkpyc5g500dy.jpg",
+    ],
+    sku: "HOOD-BALACLAVA-001",
+    brand: {
+      "@type": "Brand",
+      name: "Hoodini",
+    },
     offers: {
       "@type": "Offer",
-      price: product.price,
+      url: "https://hoodini.hu/products/balaclavahoodie",
       priceCurrency: "HUF",
-      availability:
-        product.stock > 0
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-      url: `https://hoodini.hu/products/${product.slug}`,
-      seller: { "@type": "Organization", name: "Hoodini" },
+      price: "12990",
+      priceValidUntil: "2026-12-31",
+      availability: "https://schema.org/InStock",
+      itemCondition: "https://schema.org/NewCondition",
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: "HUF",
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "HU",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          businessDays: {
+            "@type": "OpeningHoursSpecification",
+            dayOfWeek: [
+              "Monday",
+              "Tuesday",
+              "Wednesday",
+              "Thursday",
+              "Friday",
+            ],
+          },
+          cutoffTime: "14:00:00+02:00",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 1,
+            maxValue: 2,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 2,
+            maxValue: 4,
+            unitCode: "DAY",
+          },
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        returnPolicyCategory:
+          "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 30,
+      },
     },
     aggregateRating: {
       "@type": "AggregateRating",
-      ratingValue: product.rating,
-      reviewCount: product.reviewCount,
+      ratingValue: "5",
+      reviewCount: "1",
     },
+    review: [
+      {
+        "@type": "Review",
+        reviewRating: {
+          "@type": "Rating",
+          ratingValue: "5",
+        },
+        author: {
+          "@type": "Person",
+          name: "Vevő neve",
+        },
+        reviewBody: "Vevő véleménye szövege ide.",
+      },
+    ],
   };
+
+  const jsonLd =
+    slug === "balaclavahoodie" ? balaclavaJsonLd : {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      name: product.name,
+      description: product.description,
+      image: product.image,
+      sku: product.id,
+      brand: { "@type": "Brand", name: "Hoodini" },
+      offers: {
+        "@type": "Offer",
+        price: product.price,
+        priceCurrency: "HUF",
+        availability:
+          product.stock > 0
+            ? "https://schema.org/InStock"
+            : "https://schema.org/OutOfStock",
+        url: `https://hoodini.hu/products/${product.slug}`,
+        seller: { "@type": "Organization", name: "Hoodini" },
+      },
+      aggregateRating: {
+        "@type": "AggregateRating",
+        ratingValue: product.rating,
+        reviewCount: product.reviewCount,
+      },
+    };
 
   const jsonLdStr = JSON.stringify(jsonLd)
     .replace(/</g, "\\u003c")
