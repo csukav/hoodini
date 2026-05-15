@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/firestoreProducts";
-import { categoryLabelToSlug } from "@/lib/productCategories";
+import { normalizeCategorySlug } from "@/lib/productCategories";
 
 export const metadata: Metadata = {
   title: "Termékek – Teljes kollekció",
@@ -40,7 +40,7 @@ export default async function ProductsPage() {
             href={
               cat === "Összes"
                 ? "/products"
-                : `/products/${categoryLabelToSlug(cat)}`
+                : `/products/${normalizeCategorySlug(cat)}`
             }
             className="px-4 py-1.5 text-xs font-medium border border-stone-200 text-stone-600 hover:border-stone-900 hover:text-stone-950 transition-all"
           >
