@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/firestoreProducts";
+import { categoryLabelToSlug } from "@/lib/productCategories";
 
 export const metadata: Metadata = {
   title: "Termékek – Teljes kollekció",
@@ -32,13 +34,18 @@ export default async function ProductsPage() {
         aria-label="Kategóriák"
       >
         {categories.map((cat) => (
-          <span
+          <Link
             key={cat}
             role="listitem"
-            className="px-4 py-1.5 text-xs font-medium border border-stone-200 text-stone-600 hover:border-stone-900 hover:text-stone-950 cursor-pointer transition-all"
+            href={
+              cat === "Összes"
+                ? "/products"
+                : `/products/${categoryLabelToSlug(cat)}`
+            }
+            className="px-4 py-1.5 text-xs font-medium border border-stone-200 text-stone-600 hover:border-stone-900 hover:text-stone-950 transition-all"
           >
             {cat}
-          </span>
+          </Link>
         ))}
       </div>
 

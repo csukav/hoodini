@@ -4,14 +4,27 @@ import { NextResponse, type NextRequest } from "next/server";
 export const runtime = "nodejs";
 
 // Configure Cloudinary
+const cloudName =
+  process.env.CLOUDINARY_CLOUD_NAME ??
+  process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+
 cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  cloud_name: cloudName,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
 export async function POST(request: NextRequest) {
   try {
+    if (!cloudName || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      return NextResponse.json(
+        {
+          error:
+            "Cloudinary nincs megfelelően konfigurálva. Ellenőrizd a CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY és CLOUDINARY_API_SECRET környezeti változókat.",
+        },
+        { status: 500 }
+      );
+    }
     const formData = await request.formData();
     const file = formData.get("file");
 

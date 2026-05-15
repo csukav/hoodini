@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getProducts } from "@/lib/firestoreProducts";
+import { productCategoryRoutes } from "@/lib/productCategories";
 
 const BASE_URL = "https://hoodini.hu";
 
@@ -30,6 +31,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
+    ...productCategoryRoutes.map(({ slug }) => ({
+      url: `${BASE_URL}/products/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
     {
       url: `${BASE_URL}/help`,
       lastModified: new Date(),
