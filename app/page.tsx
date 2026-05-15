@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
 import HeroSection from "@/components/HeroSection";
@@ -37,6 +38,32 @@ export default async function HomePage() {
 
   return (
     <>
+      <Script
+        id="organization-jsonld"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "Hoodini",
+            url: "https://hoodini.hu",
+            logo: "https://hoodini.hu/og-image.jpg",
+            description:
+              "Prémium streetwear webshop – hoodiék, pólók, nadrágok ingyenes kiszállítással.",
+            contactPoint: {
+              "@type": "ContactPoint",
+              contactType: "customer service",
+              availableLanguage: "Hungarian",
+            },
+            sameAs: [
+              "https://www.instagram.com/hoodini",
+              "https://www.tiktok.com/@hoodini",
+              "https://www.facebook.com/hoodini",
+            ],
+          }),
+        }}
+      />
+
       <HeroSection />
 
       {/* ──────────── New Arrivals ──────────── */}
