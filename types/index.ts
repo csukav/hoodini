@@ -52,8 +52,10 @@ export interface Order {
   items: OrderItem[];
   subtotal: number;
   shippingCost: number;
+  codFee?: number;
   total: number;
   note?: string;
+  paymentMethod?: "card" | "cod";
   stripeSessionId?: string;
   couponCode?: string;
   discountAmount?: number;

@@ -3,19 +3,30 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck, Package, X, Check } from "lucide-react";
+import {
+  ArrowLeft,
+  ShieldCheck,
+  Package,
+  X,
+  Check,
+  CreditCard,
+  Banknote,
+} from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
 import type { OrderItem, Coupon } from "@/types";
 
 const SHIPPING_THRESHOLD = 15_000;
 const SHIPPING_COST = 0;
+const COD_FEE = 490; // Utánvét kezelési díj
 
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, totalItems, clearCart } = useCart();
 
   const shippingCost = totalPrice >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
+
+  const [paymentMethod, setPaymentMethod] = useState<"card" | "cod">("card");
 
   const [form, setForm] = useState({
     name: "",
@@ -42,7 +53,8 @@ export default function CheckoutPage() {
   const [couponError, setCouponError] = useState("");
 
   const discountAmount = appliedCoupon?.discountAmount || 0;
-  const grandTotal = totalPrice + shippingCost - discountAmount;
+  const codFee = paymentMethod === "cod" ? COD_FEE : 0;
+  const grandTotal = totalPrice + shippingCost + codFee - discountAmount;
 
   async function applyCoupon() {
     if (!couponCode.trim()) {
@@ -60,7 +72,7 @@ export default function CheckoutPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           code: couponCode.trim(),
-          orderTotal: totalPrice + shippingCost,
+          orderTotal: totalPrice + shippingCost + codFee,
         }),
       });
 
@@ -133,6 +145,49 @@ export default function CheckoutPage() {
       size: item.size,
     }));
 
+    // ── Utánvétes rendelés ──────────────────────────────────────────────
+    if (paymentMethod === "cod") {
+      try {
+        const res = await fetch("/api/orders", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            customer: {
+              name: form.name.trim(),
+              email: form.email.trim(),
+              phone: form.phone.trim(),
+            },
+            shippingAddress: {
+              zip: form.zip.trim(),
+              city: form.city.trim(),
+              address: form.address.trim(),
+            },
+            items: orderItems,
+            note: form.note.trim(),
+            couponCode: appliedCoupon?.code || undefined,
+            discountAmount: appliedCoupon?.discountAmount || 0,
+            paymentMethod: "cod",
+          }),
+        });
+
+        if (!res.ok) {
+          const data = await res.json();
+          setServerError(data.error ?? "Ismeretlen hiba.");
+          setLoading(false);
+          return;
+        }
+
+        const { orderId } = await res.json();
+        clearCart();
+        router.push(`/checkout/success?cod=1&order_id=${orderId}`);
+      } catch {
+        setServerError("Hálózati hiba. Próbáld újra.");
+        setLoading(false);
+      }
+      return;
+    }
+
+    // ── Bankkártyás fizetés (Stripe) ────────────────────────────────────
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -312,6 +367,99 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </section>
+
+            {/* Payment method */}
+            <section>
+              <h2 className="text-sm font-bold uppercase tracking-widest text-stone-950 mb-4 pb-2 border-b border-stone-200">
+                Fizetési mód
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Card */}
+                <button
+                  type="button"
+                  id="payment-card"
+                  onClick={() => setPaymentMethod("card")}
+                  className={`flex items-start gap-4 border-2 p-4 text-left transition-all ${
+                    paymentMethod === "card"
+                      ? "border-stone-900 bg-stone-50"
+                      : "border-stone-200 bg-white hover:border-stone-400"
+                  }`}
+                >
+                  <div
+                    className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      paymentMethod === "card"
+                        ? "border-stone-900 bg-stone-900"
+                        : "border-stone-300"
+                    }`}
+                  >
+                    {paymentMethod === "card" && (
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <CreditCard className="w-4 h-4 text-stone-700" />
+                      <span className="text-sm font-bold text-stone-900">
+                        Bankkártya
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-500 leading-relaxed">
+                      Biztonságos online fizetés Stripe-on keresztül. Visa,
+                      Mastercard, American Express.
+                    </p>
+                  </div>
+                </button>
+
+                {/* COD */}
+                <button
+                  type="button"
+                  id="payment-cod"
+                  onClick={() => setPaymentMethod("cod")}
+                  className={`flex items-start gap-4 border-2 p-4 text-left transition-all ${
+                    paymentMethod === "cod"
+                      ? "border-stone-900 bg-stone-50"
+                      : "border-stone-200 bg-white hover:border-stone-400"
+                  }`}
+                >
+                  <div
+                    className={`mt-0.5 w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                      paymentMethod === "cod"
+                        ? "border-stone-900 bg-stone-900"
+                        : "border-stone-300"
+                    }`}
+                  >
+                    {paymentMethod === "cod" && (
+                      <div className="w-2 h-2 rounded-full bg-white" />
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2 mb-1">
+                      <Banknote className="w-4 h-4 text-stone-700" />
+                      <span className="text-sm font-bold text-stone-900">
+                        Utánvét
+                      </span>
+                      <span className="text-xs bg-stone-100 text-stone-600 px-1.5 py-0.5 font-medium">
+                        +{formatPrice(COD_FEE)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-stone-500 leading-relaxed">
+                      Fizess a futárnak csomag átvételekor, készpénzzel vagy
+                      bankkártyával.
+                    </p>
+                  </div>
+                </button>
+              </div>
+
+              {paymentMethod === "cod" && (
+                <div className="mt-3 flex items-start gap-2 bg-amber-50 border border-amber-200 px-4 py-3">
+                  <Banknote className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-xs text-amber-800">
+                    <strong>Utánvét kezelési díja: {formatPrice(COD_FEE)}</strong> – ezt az összeget a csomag
+                    átvételi árával együtt kell a futárnak kifizetni.
+                  </p>
+                </div>
+              )}
+            </section>
           </div>
 
           {/* Right: summary */}
@@ -359,6 +507,14 @@ export default function CheckoutPage() {
                       : formatPrice(shippingCost)}
                   </dd>
                 </div>
+                {paymentMethod === "cod" && (
+                  <div className="flex justify-between text-stone-500">
+                    <dt>Utánvét kezelési díj</dt>
+                    <dd className="font-medium text-stone-800">
+                      {formatPrice(COD_FEE)}
+                    </dd>
+                  </div>
+                )}
                 {appliedCoupon && (
                   <div className="flex justify-between text-emerald-600">
                     <dt>Kupon ({appliedCoupon.code})</dt>
@@ -443,12 +599,20 @@ export default function CheckoutPage() {
                 disabled={loading}
                 className="btn-dark w-full mt-6 justify-center flex items-center gap-2 py-3.5 disabled:opacity-60"
               >
-                {loading ? "Átirányítás a fizetéshez..." : "Fizetés"}
+                {loading
+                  ? paymentMethod === "cod"
+                    ? "Rendelés leadása..."
+                    : "Átirányítás a fizetéshez..."
+                  : paymentMethod === "cod"
+                    ? "Rendelés leadása (utánvéttel)"
+                    : "Fizetés bankkártyával"}
               </button>
 
               <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-stone-400">
                 <ShieldCheck className="w-3.5 h-3.5" />
-                Biztonságos fizetés – SSL titkosítással védve
+                {paymentMethod === "card"
+                  ? "Biztonságos fizetés – SSL titkosítással védve"
+                  : "Rendelésed biztonságosan kerül rögzítésre"}
               </p>
             </div>
           </aside>

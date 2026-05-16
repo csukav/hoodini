@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Banknote } from "lucide-react";
 import { stripe } from "@/lib/stripe";
 import { doc, getDoc, updateDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -14,13 +14,18 @@ export const metadata: Metadata = {
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: { session_id?: string; orderId?: string };
+  searchParams: { session_id?: string; orderId?: string; cod?: string; order_id?: string };
 }) {
+  const isCod = searchParams.cod === "1";
   let paid = false;
   let conversionValue: number | undefined;
   let transactionId: string | undefined;
 
-  if (searchParams.session_id) {
+  // Utánvétes rendelés – nincs Stripe session
+  if (isCod) {
+    paid = true; // A rendelés sikeresen fel lett adva
+    transactionId = searchParams.order_id;
+  } else if (searchParams.session_id) {
     try {
       const session = await stripe.checkout.sessions.retrieve(
         searchParams.session_id,
@@ -52,7 +57,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="max-w-xl mx-auto px-4 py-28 text-center">
-      {paid && (
+      {paid && !isCod && (
         <GadsConversionEvent
           value={conversionValue}
           currency="HUF"
@@ -64,12 +69,26 @@ export default async function CheckoutSuccessPage({
         aria-hidden="true"
       />
       <h1 className="text-3xl font-black text-stone-950 mb-3">
-        {paid ? "Sikeres fizetés!" : "Rendelés leadva!"}
+        {isCod ? "Rendelés leadva!" : paid ? "Sikeres fizetés!" : "Rendelés leadva!"}
       </h1>
-      <p className="text-stone-500 mb-10 leading-relaxed">
+      <p className="text-stone-500 mb-6 leading-relaxed">
         Köszönjük a vásárlást! Elküldtük a visszaigazolást a megadott
         e-mail-címre. Hamarosan felvesszük veled a kapcsolatot.
       </p>
+      {isCod && (
+        <div className="mb-8 flex items-start gap-3 bg-amber-50 border border-amber-200 rounded-lg px-5 py-4 text-left">
+          <Banknote className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-amber-900 mb-1">
+              Utánvétes fizetés
+            </p>
+            <p className="text-xs text-amber-800 leading-relaxed">
+              A csomag átvételekor kérjük, tartsd készen a pontos összeget a
+              futár számára. Az összeg tartalmazza az utánvét kezelési díját is.
+            </p>
+          </div>
+        </div>
+      )}
       <Link
         href="/products"
         className="btn-dark inline-flex items-center gap-2"

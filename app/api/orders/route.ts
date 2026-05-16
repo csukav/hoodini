@@ -16,12 +16,15 @@ const transporter = nodemailer.createTransport({
 
 const SHIPPING_THRESHOLD = 15_000;
 const SHIPPING_COST = 0;
+const COD_FEE = 490; // Utánvét kezelési díj (Ft)
 
 function formatPrice(n: number) {
   return n.toLocaleString("hu-HU") + " Ft";
 }
 
 function buildEmailHtml(orderId: string, order: OrderInput): string {
+  const isCod = order.paymentMethod === "cod";
+
   const itemRows = order.items
     .map(
       (item: OrderItem) => `
@@ -36,6 +39,24 @@ function buildEmailHtml(orderId: string, order: OrderInput): string {
       </tr>`,
     )
     .join("");
+
+  const codFeeRow = isCod && order.codFee
+    ? `<tr>
+        <td style="color:#78716c;font-size:14px;padding:4px 0;">Utánvét kezelési díj</td>
+        <td style="text-align:right;font-size:14px;color:#44403c;padding:4px 0;">${formatPrice(order.codFee)}</td>
+       </tr>`
+    : "";
+
+  const paymentBadge = isCod
+    ? `<tr>
+        <td colspan="2" style="padding-top:20px;">
+          <div style="background:#fef9c3;border:1px solid #fde047;border-radius:6px;padding:12px 16px;display:inline-block;">
+            <span style="font-size:13px;font-weight:700;color:#854d0e;">💵 Utánvétes fizetés</span>
+            <p style="margin:4px 0 0;font-size:12px;color:#a16207;">A csomag átvételekor kell kifizetni a futárnak: <strong>${formatPrice(order.total)}</strong></p>
+          </div>
+        </td>
+       </tr>`
+    : "";
 
   return `
 <!DOCTYPE html>
@@ -86,13 +107,15 @@ function buildEmailHtml(orderId: string, order: OrderInput): string {
                 <td style="color:#78716c;font-size:14px;padding:4px 0;">Szállítás</td>
                 <td style="text-align:right;font-size:14px;${order.shippingCost === 0 ? "color:#16a34a;" : "color:#44403c;"}padding:4px 0;">${order.shippingCost === 0 ? "Ingyenes" : formatPrice(order.shippingCost)}</td>
               </tr>
+              ${codFeeRow}
               <tr>
                 <td style="font-size:16px;font-weight:800;color:#0c0a09;padding-top:12px;border-top:2px solid #e7e5e4;">Végösszeg</td>
                 <td style="text-align:right;font-size:16px;font-weight:800;color:#0c0a09;padding-top:12px;border-top:2px solid #e7e5e4;">${formatPrice(order.total)}</td>
               </tr>
+              ${paymentBadge}
             </table>
 
-            <!-- Shipping -->
+            <!-- Shipping address -->
             <table style="background:#f5f5f4;width:100%;padding:16px;margin-top:28px;" cellpadding="0" cellspacing="0">
               <tr><td colspan="2" style="font-size:12px;color:#a8a29e;text-transform:uppercase;letter-spacing:1px;padding-bottom:8px;">Szállítási cím</td></tr>
               <tr>
@@ -126,11 +149,14 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    const { customer, shippingAddress, items, note } = body as {
+    const { customer, shippingAddress, items, note, couponCode, discountAmount, paymentMethod } = body as {
       customer: { name: string; email: string; phone: string };
       shippingAddress: { zip: string; city: string; address: string };
       items: OrderItem[];
       note?: string;
+      couponCode?: string;
+      discountAmount?: number;
+      paymentMethod?: "card" | "cod";
     };
 
     if (
@@ -161,7 +187,10 @@ export async function POST(req: NextRequest) {
       0,
     );
     const shippingCost = subtotal >= SHIPPING_THRESHOLD ? 0 : SHIPPING_COST;
-    const total = subtotal + shippingCost;
+    const discount = discountAmount || 0;
+    const isCod = paymentMethod === "cod";
+    const codFee = isCod ? COD_FEE : 0;
+    const total = subtotal + shippingCost + codFee - discount;
 
     const orderInput: OrderInput = {
       status: "pending",
@@ -170,13 +199,17 @@ export async function POST(req: NextRequest) {
       items,
       subtotal,
       shippingCost,
+      codFee: isCod ? codFee : undefined,
       total,
       note: note ?? "",
+      paymentMethod: isCod ? "cod" : "card",
+      couponCode: couponCode || undefined,
+      discountAmount: discount || undefined,
     };
 
     const orderId = await createOrder(orderInput);
 
-    // Email küldés – nem blokkoljuk a rendelés sikerét, ha hiba van
+    // Email küldés
     try {
       await transporter.sendMail({
         from: `"Hoodini" <${process.env.GMAIL_USER}>`,

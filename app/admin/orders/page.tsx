@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronUp, ArrowLeft } from "lucide-react";
+import { ChevronDown, ChevronUp, ArrowLeft, Banknote } from "lucide-react";
 import { useAdminAuth } from "@/context/AdminAuthContext";
 import { getOrders, updateOrderStatus } from "@/lib/firestoreOrders";
 import type { Order, OrderStatus } from "@/types";
@@ -86,7 +86,12 @@ function OrderRow({
           {formatPrice(order.total)}
         </span>
         <StatusBadge status={order.status} />
-        {order.stripeSessionId ? (
+        {order.paymentMethod === "cod" ? (
+          <span className="inline-flex items-center gap-1 rounded-full px-3 py-0.5 text-xs font-semibold bg-amber-100 text-amber-700">
+            <Banknote className="w-3 h-3" />
+            Utánvét
+          </span>
+        ) : order.stripeSessionId ? (
           <span className="inline-block rounded-full px-3 py-0.5 text-xs font-semibold bg-emerald-100 text-emerald-700">
             Fizetve
           </span>
@@ -177,6 +182,12 @@ function OrderRow({
                     : formatPrice(order.shippingCost)}
                 </span>
               </div>
+              {order.codFee && (
+                <div className="flex justify-between text-stone-500">
+                  <span>Utánvét kezelési díj</span>
+                  <span>{formatPrice(order.codFee)}</span>
+                </div>
+              )}
               {order.discountAmount && (
                 <div className="flex justify-between text-emerald-600">
                   <span>
@@ -197,7 +208,12 @@ function OrderRow({
                 <span className="text-xs font-semibold uppercase tracking-widest text-stone-400">
                   Fizetés:
                 </span>
-                {order.stripeSessionId ? (
+                {order.paymentMethod === "cod" ? (
+                  <span className="inline-flex items-center gap-1 text-xs font-semibold text-amber-700">
+                    <span className="w-2 h-2 rounded-full bg-amber-500" />
+                    Utánvét (futárnál fizet)
+                  </span>
+                ) : order.stripeSessionId ? (
                   <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-700">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
                     Sikeres (Stripe)
