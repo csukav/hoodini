@@ -99,8 +99,9 @@ export async function POST(req: NextRequest) {
       shippingCost,
       total,
       note: note ?? "",
-      couponCode: couponCode || undefined,
-      discountAmount: discount || undefined,
+      paymentMethod: "card",
+      ...(couponCode ? { couponCode } : {}),
+      ...(discount > 0 ? { discountAmount: discount } : {}),
     };
     const orderId = await createOrder(orderInput);
 

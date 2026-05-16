@@ -199,12 +199,12 @@ export async function POST(req: NextRequest) {
       items,
       subtotal,
       shippingCost,
-      codFee: isCod ? codFee : undefined,
       total,
       note: note ?? "",
       paymentMethod: isCod ? "cod" : "card",
-      couponCode: couponCode || undefined,
-      discountAmount: discount || undefined,
+      ...(isCod && codFee ? { codFee } : {}),
+      ...(couponCode ? { couponCode } : {}),
+      ...(discount > 0 ? { discountAmount: discount } : {}),
     };
 
     const orderId = await createOrder(orderInput);
