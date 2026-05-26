@@ -18,7 +18,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Firebase not available during build – product URLs skipped
   }
 
-  return [
+  // Static pages
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: BASE_URL,
       lastModified: new Date(),
@@ -31,18 +32,131 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "daily",
       priority: 0.9,
     },
-    ...productCategoryRoutes.map(({ slug }) => ({
-      url: `${BASE_URL}/products/${slug}`,
+    {
+      url: `${BASE_URL}/about`,
       lastModified: new Date(),
-      changeFrequency: "weekly" as const,
+      changeFrequency: "monthly",
       priority: 0.7,
-    })),
+    },
+    {
+      url: `${BASE_URL}/tortenetunk`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${BASE_URL}/contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/kapcsolat`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/cart`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/checkout`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
     {
       url: `${BASE_URL}/help`,
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.5,
     },
-    ...productUrls,
+    {
+      url: `${BASE_URL}/shipping`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/szallitas`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/returns`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/visszakuldes`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/warranty`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/garancia`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${BASE_URL}/sustainability`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/fenntarthatosag`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/careers`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/karrier`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
+    {
+      url: `${BASE_URL}/privacy`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: `${BASE_URL}/aszf`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
   ];
+
+  // Product categories
+  const categoryPages: MetadataRoute.Sitemap = productCategoryRoutes.map(
+    ({ slug }) => ({
+      url: `${BASE_URL}/products/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })
+  );
+
+  return [...staticPages, ...categoryPages, ...productUrls];
 }
