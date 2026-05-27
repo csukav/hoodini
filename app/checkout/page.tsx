@@ -20,6 +20,54 @@ const SHIPPING_THRESHOLD = 15_000;
 const SHIPPING_COST = 0;
 const COD_FEE = 490; // Utánvét kezelési díj
 
+type FormType = {
+  name: string;
+  email: string;
+  phone: string;
+  zip: string;
+  city: string;
+  address: string;
+  note: string;
+};
+
+function Field({
+  label,
+  name,
+  type = "text",
+  placeholder,
+  autoComplete,
+  value,
+  error,
+  onChange,
+}: {
+  label: string;
+  name: keyof FormType;
+  type?: string;
+  placeholder?: string;
+  autoComplete?: string;
+  value: string;
+  error?: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+}) {
+  return (
+    <div>
+      <label className="block text-xs font-semibold uppercase tracking-widest text-stone-500 mb-1">
+        {label}
+      </label>
+      <input
+        type={type}
+        name={String(name)}
+        value={value}
+        onChange={onChange}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className={`w-full border ${error ? "border-red-400" : "border-stone-300"} bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-stone-800`}
+      />
+      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+    </div>
+  );
+}
+
 export default function CheckoutPage() {
   const router = useRouter();
   const { items, totalPrice, totalItems, clearCart } = useCart();
@@ -247,37 +295,7 @@ export default function CheckoutPage() {
     );
   }
 
-  const Field = ({
-    label,
-    name,
-    type = "text",
-    placeholder,
-    autoComplete,
-  }: {
-    label: string;
-    name: keyof typeof form;
-    type?: string;
-    placeholder?: string;
-    autoComplete?: string;
-  }) => (
-    <div>
-      <label className="block text-xs font-semibold uppercase tracking-widest text-stone-500 mb-1">
-        {label}
-      </label>
-      <input
-        type={type}
-        name={name}
-        value={form[name]}
-        onChange={handleChange}
-        placeholder={placeholder}
-        autoComplete={autoComplete}
-        className={`w-full border ${errors[name] ? "border-red-400" : "border-stone-300"} bg-white px-3 py-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-stone-800`}
-      />
-      {errors[name] && (
-        <p className="mt-1 text-xs text-red-500">{errors[name]}</p>
-      )}
-    </div>
-  );
+  
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 md:py-16">
@@ -307,6 +325,9 @@ export default function CheckoutPage() {
                     name="name"
                     autoComplete="name"
                     placeholder="Kovács János"
+                    value={form.name}
+                    onChange={handleChange}
+                    error={errors.name}
                   />
                 </div>
                 <Field
@@ -315,6 +336,9 @@ export default function CheckoutPage() {
                   type="email"
                   autoComplete="email"
                   placeholder="pelda@email.hu"
+                  value={form.email}
+                  onChange={handleChange}
+                  error={errors.email}
                 />
                 <Field
                   label="Telefonszám *"
@@ -322,6 +346,9 @@ export default function CheckoutPage() {
                   type="tel"
                   autoComplete="tel"
                   placeholder="+36 30 123 4567"
+                  value={form.phone}
+                  onChange={handleChange}
+                  error={errors.phone}
                 />
               </div>
             </section>
@@ -337,12 +364,18 @@ export default function CheckoutPage() {
                   name="zip"
                   autoComplete="postal-code"
                   placeholder="1011"
+                  value={form.zip}
+                  onChange={handleChange}
+                  error={errors.zip}
                 />
                 <Field
                   label="Város *"
                   name="city"
                   autoComplete="address-level2"
                   placeholder="Budapest"
+                  value={form.city}
+                  onChange={handleChange}
+                  error={errors.city}
                 />
                 <div className="sm:col-span-2">
                   <Field
@@ -350,6 +383,9 @@ export default function CheckoutPage() {
                     name="address"
                     autoComplete="street-address"
                     placeholder="Fő utca 1."
+                    value={form.address}
+                    onChange={handleChange}
+                    error={errors.address}
                   />
                 </div>
                 <div className="sm:col-span-2">
