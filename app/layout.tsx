@@ -37,6 +37,11 @@ export const metadata: Metadata = {
     "webshop",
     "hoodini",
   ],
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
   openGraph: {
     type: "website",
     locale: "hu_HU",
