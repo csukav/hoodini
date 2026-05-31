@@ -1,7 +1,10 @@
 ﻿export const productCategoryRoutes = [
   { slug: "hoodie", label: "Hoodie" },
   { slug: "polo", label: "Póló" },
+  { slug: "polok", label: "Pólók" },
   { slug: "nadrag", label: "Nadrág" },
+  { slug: "nadragok", label: "Nadrágok" },
+  { slug: "sale", label: "Sale" },
 ];
 
 export function normalizeCategorySlug(category: string): string {

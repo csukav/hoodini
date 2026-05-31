@@ -5,6 +5,7 @@ import { Star, Package, Truck, RotateCcw, ChevronRight } from "lucide-react";
 import { getProductBySlug } from "@/lib/firestoreProducts";
 import { formatPrice } from "@/lib/utils";
 import AddToCartButton from "@/components/AddToCartButton";
+import SizeChart from "@/components/SizeChart";
 import ImageLightbox from "@/components/ImageLightbox";
 
 export const dynamic = "force-dynamic";
@@ -79,13 +80,7 @@ export default async function ProductPage({ params }: Props) {
           "@type": "ShippingDeliveryTime",
           businessDays: {
             "@type": "OpeningHoursSpecification",
-            dayOfWeek: [
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-            ],
+            dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
           },
           cutoffTime: "14:00:00+02:00",
           handlingTime: {
@@ -131,31 +126,33 @@ export default async function ProductPage({ params }: Props) {
   };
 
   const jsonLd =
-    slug === "balaclavahoodie" ? balaclavaJsonLd : {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      name: product.name,
-      description: product.description,
-      image: product.image,
-      sku: product.id,
-      brand: { "@type": "Brand", name: "Hoodini" },
-      offers: {
-        "@type": "Offer",
-        price: product.price,
-        priceCurrency: "HUF",
-        availability:
-          product.stock > 0
-            ? "https://schema.org/InStock"
-            : "https://schema.org/OutOfStock",
-        url: `https://hoodini.hu/products/${product.slug}`,
-        seller: { "@type": "Organization", name: "Hoodini" },
-      },
-      aggregateRating: {
-        "@type": "AggregateRating",
-        ratingValue: product.rating,
-        reviewCount: product.reviewCount,
-      },
-    };
+    slug === "balaclavahoodie"
+      ? balaclavaJsonLd
+      : {
+          "@context": "https://schema.org",
+          "@type": "Product",
+          name: product.name,
+          description: product.description,
+          image: product.image,
+          sku: product.id,
+          brand: { "@type": "Brand", name: "Hoodini" },
+          offers: {
+            "@type": "Offer",
+            price: product.price,
+            priceCurrency: "HUF",
+            availability:
+              product.stock > 0
+                ? "https://schema.org/InStock"
+                : "https://schema.org/OutOfStock",
+            url: `https://hoodini.hu/products/${product.slug}`,
+            seller: { "@type": "Organization", name: "Hoodini" },
+          },
+          aggregateRating: {
+            "@type": "AggregateRating",
+            ratingValue: product.rating,
+            reviewCount: product.reviewCount,
+          },
+        };
 
   const jsonLdStr = JSON.stringify(jsonLd)
     .replace(/</g, "\\u003c")
@@ -206,7 +203,10 @@ export default async function ProductPage({ params }: Props) {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           {/* ── Product image ── */}
-          <ImageLightbox images={product.images || [product.image]} alt={product.name} />
+          <ImageLightbox
+            images={product.images || [product.image]}
+            alt={product.name}
+          />
 
           {/* ── Product details ── */}
           <div className="flex flex-col">
@@ -235,10 +235,16 @@ export default async function ProductPage({ params }: Props) {
                 ))}
               </div>
               <span className="text-sm text-stone-500">
-                <span className="font-semibold text-stone-800">
-                  {product.rating}
-                </span>{" "}
-                · {product.reviewCount} értékelés
+                {product.reviewCount > 0 ? (
+                  <>
+                    <span className="font-semibold text-stone-800">
+                      {product.rating}
+                    </span>{" "}
+                    · {product.reviewCount} értékelés
+                  </>
+                ) : (
+                  "Legyél az első értékelő!"
+                )}
               </span>
             </div>
 
@@ -274,6 +280,9 @@ export default async function ProductPage({ params }: Props) {
                 availableSizes={availableSizes}
               />
             </div>
+
+            {/* Size chart */}
+            <SizeChart />
 
             {/* Description */}
             <p className="mt-6 text-stone-600 leading-relaxed">

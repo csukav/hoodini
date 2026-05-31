@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState } from "react";
+import { Star } from "lucide-react";
 import type { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { formatPrice } from "@/lib/utils";
@@ -81,6 +82,33 @@ export default function ProductCard({ product }: ProductCardProps) {
           </p>
         </Link>
         <p className="text-xs text-stone-400 mt-0.5">{product.category}</p>
+
+        {/* Rating */}
+        {product.reviewCount > 0 ? (
+          <div className="flex items-center gap-1.5 mt-1.5">
+            <div className="flex items-center gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-3 h-3 ${
+                    i < Math.floor(product.rating)
+                      ? "text-amber-400 fill-amber-400"
+                      : "text-stone-200 fill-stone-200"
+                  }`}
+                  aria-hidden="true"
+                />
+              ))}
+            </div>
+            <span className="text-xs text-stone-600">
+              {product.rating.toFixed(1)}
+            </span>
+          </div>
+        ) : (
+          <p className="text-xs text-stone-400 mt-1.5">
+            Legyél az első értékelő!
+          </p>
+        )}
+
         <p className="text-sm font-bold text-stone-950 mt-1">
           {formatPrice(product.price)}
         </p>
