@@ -151,10 +151,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Product categories
   const categoryPages: MetadataRoute.Sitemap = productCategoryRoutes.map(
     ({ slug }) => ({
-      url: `${BASE_URL}/products/${slug}`,
+      url: `${BASE_URL}/products?category=${slug}`,
       lastModified: new Date(),
       changeFrequency: "weekly" as const,
-      priority: 0.7,
+      priority: 0.8,
     })
   );
 
