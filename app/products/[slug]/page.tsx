@@ -169,7 +169,9 @@ export default async function ProductPage({ params }: Props) {
     { icon: Package, title: "Ingyenes szállítás", desc: "15 000 Ft felett" },
   ];
 
-  const availableSizes = product.sizes ?? ["S", "M", "L", "XL"];
+  const availableSizes = (product.sizes ?? ["S", "M", "L", "XL"]).filter(
+    (size) => size !== "XS",
+  );
 
   return (
     <>

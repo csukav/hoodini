@@ -28,7 +28,7 @@ const faqs: { question: string; answer: string }[] = [
   {
     question: "Milyen méretekben kaphatók a termékek?",
     answer:
-      "Termékeinket XS–3XL méretben kínáljuk. Minden termékoldal tartalmaz részletes mérettáblázatot cm-es adatokkal, hogy biztosan megtaláld a tökéletes fittinget.",
+      "Jelenleg XS méretet nem kínálunk. Minden termékoldal tartalmaz részletes mérettáblázatot cm-es adatokkal, hogy biztosan megtaláld a tökéletes fittinget.",
   },
   {
     question: "Hogyan válasszam ki a megfelelő méretet?",

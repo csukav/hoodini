@@ -18,6 +18,10 @@ const COL = "products";
 
 function toProduct(id: string, data: DocumentData): Product {
   const images = data.images ?? (data.image ? [data.image] : []);
+  const sizes = Array.isArray(data.sizes)
+    ? data.sizes
+    : ["S", "M", "L", "XL", "XXL"];
+
   return {
     id,
     slug: data.slug ?? "",
@@ -30,7 +34,7 @@ function toProduct(id: string, data: DocumentData): Product {
     stock: data.stock ?? 0,
     rating: data.rating ?? 0,
     reviewCount: data.reviewCount ?? 0,
-    sizes: data.sizes ?? ["XS", "S", "M", "L", "XL", "XXL"],
+    sizes: sizes.filter((size) => size !== "XS"),
   };
 }
 
