@@ -5,16 +5,17 @@ import { ChevronDown } from "lucide-react";
 
 interface SizeData {
   size: string;
+  vall: string; // cm
   chest: string; // cm
   length: string; // cm
+  ujjhossz: string; // cm
 }
 
 const DEFAULT_SIZE_DATA: SizeData[] = [
-  { size: "XS", chest: "88", length: "68" },
-  { size: "S", chest: "92", length: "70" },
-  { size: "M", chest: "96", length: "72" },
-  { size: "L", chest: "100", length: "74" },
-  { size: "XL", chest: "104", length: "76" },
+  { size: "S", vall: "46", chest: "110", length: "70", ujjhossz: "65" },
+  { size: "M", vall: "48", chest: "114", length: "72", ujjhossz: "66" },
+  { size: "L", vall: "50", chest: "118", length: "74", ujjhossz: "67" },
+  { size: "XL", vall: "52", chest: "122", length: "76", ujjhossz: "68" },
 ];
 
 interface SizeChartProps {
@@ -50,10 +51,16 @@ export default function SizeChart({
                   Méret
                 </th>
                 <th className="text-left font-semibold text-stone-950 py-2">
+                  Vállszélesség (cm)
+                </th>
+                <th className="text-left font-semibold text-stone-950 py-2">
                   Mellbőség (cm)
                 </th>
                 <th className="text-left font-semibold text-stone-950 py-2">
                   Hossz (cm)
+                </th>
+                <th className="text-left font-semibold text-stone-950 py-2">
+                  Ujjhossz (cm)
                 </th>
               </tr>
             </thead>
@@ -63,8 +70,10 @@ export default function SizeChart({
                   <td className="py-2 text-stone-950 font-medium">
                     {row.size}
                   </td>
+                  <td className="py-2 text-stone-600">{row.vall}</td>
                   <td className="py-2 text-stone-600">{row.chest}</td>
                   <td className="py-2 text-stone-600">{row.length}</td>
+                  <td className="py-2 text-stone-600">{row.ujjhossz}</td>
                 </tr>
               ))}
             </tbody>
