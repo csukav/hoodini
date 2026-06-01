@@ -38,9 +38,9 @@ export const metadata: Metadata = {
     "hoodini",
   ],
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: "/favicon.svg?v=1",
+    shortcut: "/favicon.svg?v=1",
+    apple: "/favicon.svg?v=1",
   },
   openGraph: {
     type: "website",
