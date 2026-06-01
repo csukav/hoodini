@@ -147,11 +147,14 @@ export default function RootLayout({
                   <p className="label-xs text-stone-100 mb-5">Termékek</p>
                   <ul className="space-y-3 text-sm">
                     {[
-                      { label: "Hoodie", href: "/products" },
-                      { label: "Pólók", href: "/products" },
-                      { label: "Nadrágok", href: "/products" },
+                      { label: "Hoodie", href: "/products?category=hoodie" },
+                      { label: "Pólók", href: "/products?category=polok" },
+                      {
+                        label: "Nadrágok",
+                        href: "/products?category=nadragok",
+                      },
                       { label: "Kiegészítők", href: "/products" },
-                      { label: "Sale", href: "/products" },
+                      { label: "Sale", href: "/products?category=sale" },
                     ].map((l) => (
                       <li key={l.label}>
                         <a
@@ -207,18 +210,35 @@ export default function RootLayout({
                 <div>
                   <p className="label-xs text-stone-100 mb-5">Közösség</p>
                   <ul className="space-y-3 text-sm">
-                    {["Instagram", "TikTok", "Facebook", "Pinterest"].map(
-                      (l) => (
-                        <li key={l}>
-                          <a
-                            href="#"
-                            className="hover:text-stone-100 transition-colors"
-                          >
-                            {l}
-                          </a>
-                        </li>
-                      ),
-                    )}
+                    {[
+                      {
+                        label: "Instagram",
+                        href: "https://instagram.com/hoodini.hu",
+                      },
+                      {
+                        label: "TikTok",
+                        href: "https://tiktok.com/@hoodini.hu",
+                      },
+                      {
+                        label: "Facebook",
+                        href: "https://facebook.com/hoodini.hu",
+                      },
+                      {
+                        label: "Pinterest",
+                        href: "https://pinterest.com/hoodini.hu",
+                      },
+                    ].map((l) => (
+                      <li key={l.label}>
+                        <a
+                          href={l.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:text-stone-100 transition-colors"
+                        >
+                          {l.label}
+                        </a>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>

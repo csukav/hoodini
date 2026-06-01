@@ -6,17 +6,17 @@ import { ShoppingCart, Search, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 
 const leftLinks = [
-  { href: "/products", label: "HOODIE" },
-  { href: "/products", label: "PÓLÓK" },
-  { href: "/products", label: "NADRÁGOK" },
-  { href: "/products", label: "SALE" },
+  { href: "/products?category=hoodie", label: "HOODIE" },
+  { href: "/products?category=polok", label: "PÓLÓK" },
+  { href: "/products?category=nadragok", label: "NADRÁGOK" },
+  { href: "/products?category=sale", label: "SALE" },
 ];
 const rightLinks = [{ href: "/help", label: "GYIK" }];
 const mobileLinks = [
-  { href: "/products", label: "Hoodie" },
-  { href: "/products", label: "Pólók" },
-  { href: "/products", label: "Nadrágok" },
-  { href: "/products", label: "Sale" },
+  { href: "/products?category=hoodie", label: "Hoodie" },
+  { href: "/products?category=polok", label: "Pólók" },
+  { href: "/products?category=nadragok", label: "Nadrágok" },
+  { href: "/products?category=sale", label: "Sale" },
 ];
 
 export default function Navbar() {
