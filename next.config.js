@@ -2,8 +2,9 @@
 const path = require("path");
 
 const nextConfig = {
-  // Disable Turbopack temporarily to avoid high CPU / freeze issues on some systems
-  turbopack: false,
+  turbopack: {
+    root: __dirname,
+  },
   images: {
     remotePatterns: [
       {

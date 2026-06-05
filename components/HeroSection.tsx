@@ -12,7 +12,7 @@ export default function HeroSection() {
       {/* Full-bleed background image */}
       <Image
         src="/hero.jpg"
-        alt=""
+        alt="Hero kép a 2026 tavasz–nyár kollekcióról"
         fill
         priority
         quality={95}
