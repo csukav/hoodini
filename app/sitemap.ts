@@ -1,8 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getProducts } from "@/lib/firestoreProducts";
-import { productCategoryRoutes } from "@/lib/productCategories";
 
 const BASE_URL = "https://hoodini.hu";
+const CATEGORY_SLUGS = ["hoodie", "polok", "nadragok", "sale"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let productUrls: MetadataRoute.Sitemap = [];
@@ -149,14 +149,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   ];
 
   // Product categories
-  const categoryPages: MetadataRoute.Sitemap = productCategoryRoutes.map(
-    ({ slug }) => ({
-      url: `${BASE_URL}/products?category=${slug}`,
-      lastModified: new Date(),
-      changeFrequency: "weekly" as const,
-      priority: 0.8,
-    }),
-  );
+  const categoryPages: MetadataRoute.Sitemap = CATEGORY_SLUGS.map((slug) => ({
+    url: `${BASE_URL}/products?category=${slug}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly" as const,
+    priority: 0.8,
+  }));
 
   return [...staticPages, ...categoryPages, ...productUrls];
 }

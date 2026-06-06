@@ -97,6 +97,81 @@ export default async function ProductsPage({
           ))}
         </div>
       )}
+
+      {/* SEO Content Section */}
+      <div className="mt-16 md:mt-20 pt-12 border-t border-stone-200">
+        <article className="prose prose-sm max-w-4xl">
+          <h2 className="text-2xl md:text-3xl font-bold text-stone-950 mb-6">
+            Fedezd fel a Hoodini streetwear kollekcióját
+          </h2>
+
+          <p className="text-stone-700 leading-relaxed mb-4">
+            Üdvözölünk a Hoodini termékek világában! Mi az Magyarország vezető
+            streetwear márkája, amely prémium minőségű ruhadarabokat kínál a
+            modern, stílustudat fiatalok számára. A Hoodini kollekcióban
+            megtalálsz mindent, amit szükségsége van a tökéletes streetwear
+            outfithez: divatos hoodiéket, magas minőségű pólókat, kényelmes
+            nadrágokat és egyéb kiegészítőket, amelyek biztosan felemelik a te
+            stílusod.
+          </p>
+
+          <h3 className="text-xl font-bold text-stone-950 mt-6 mb-3">
+            Hoodie – Az alapvető streetwear darab
+          </h3>
+          <p className="text-stone-700 leading-relaxed mb-4">
+            A Hoodini hoodie kollekcióval találkozhat az egyik legkeresettebb
+            ruhadarabbal a streetwear világában. Minden hoodie egyedi designnal,
+            prémium anyagokkal és lenyűgöző kényelemmel készül. Akár casual
+            hétköznapiakhoz, akár sportosabb megjelenéshez, a mi hoodiéink
+            tökéletes választás. Az elasztikus anyagok és ergonomikus vágás
+            biztosítja, hogy hosszú éven át hordhatod kedvenc darabaidat.
+          </p>
+
+          <h3 className="text-xl font-bold text-stone-950 mt-6 mb-3">
+            Pólók – Sokoldalú és stílusos
+          </h3>
+          <p className="text-stone-700 leading-relaxed mb-4">
+            A Hoodini pólók az egyedi tervezésről és a fenntartható
+            anyaghasználatról ismert. Válassz klasszikus fazonok közül vagy
+            fedezz fel modern, merész dizájnokat. A pólók számos szín és méreten
+            elérhetőek, így biztosan megtalálod a neked való darabot. Legyen szó
+            egy egyszerű pólóról vagy egy nyomott grafikás darabról, minden
+            terméket a legmagasabb minőségi szabványoknak megfelelően gyártunk.
+          </p>
+
+          <h3 className="text-xl font-bold text-stone-950 mt-6 mb-3">
+            Nadrágok – Kényelem és stílus egységben
+          </h3>
+          <p className="text-stone-700 leading-relaxed mb-4">
+            A Hoodini nadrágok kollekcióját úgy terveztük, hogy kombinálják az
+            utcai stílus és az alapvető kényelmet. A streetwear-inspirált
+            fazonok, rugalmas anyagok és gondos feldolgozás garantálják, hogy
+            minden nadrág tökéletes illeszkedést nyújt. Legyen szó klasszikus
+            jogger nadrágról vagy trendy szoknyavágási modellek közül, a mi
+            nadrágok biztos találat a te szekrényed számára.
+          </p>
+
+          <h3 className="text-xl font-bold text-stone-950 mt-6 mb-3">
+            Miért válassz Hoodini-t?
+          </h3>
+          <p className="text-stone-700 leading-relaxed mb-4">
+            A Hoodini más streetwear brandoktól azért tér el, mert
+            elkötelezetten dolgozunk a minőség, az originalitás és az
+            ügyfélszolgálat tekintetében. Minden terméket szorgalmasan
+            vizsgálunk meg, hogy biztosítsuk az összes Hoodini szabvány
+            teljesítését. Az ingyenes szállítás 15 000 Ft feletti rendelésekre,
+            gyors kézbesítés és ügyfélközpontú támogatás teheti vásárlási
+            élmményedet egyedivé. Csatlakozz azokhoz az ezrekhez, akik már
+            megbíznak a Hoodini-ban az ő streetwear szükségleteik tekintetében.
+          </p>
+
+          <p className="text-stone-600 text-sm italic mt-6">
+            Kezdj vásárlni ma, és fedezd fel a Hoodini kollekcióban a te
+            következő kedvenc darabját – legyen szó hoodiéről, pólóról vagy
+            nadrágról!
+          </p>
+        </article>
+      </div>
     </div>
   );
 }
