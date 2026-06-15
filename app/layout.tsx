@@ -4,6 +4,7 @@ import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
+import NewsletterModal from "@/components/NewsletterModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -111,6 +112,7 @@ export default function RootLayout({
       <body className="font-sans bg-stone-50 text-stone-950 antialiased">
         <CartProvider>
           <Navbar />
+          <NewsletterModal />
           <main id="main-content">{children}</main>
 
           {/* ── Footer ── */}
