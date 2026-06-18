@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
+import Scroll3DExperience from "@/components/Scroll3DExperience";
 import { getProducts } from "@/lib/firestoreProducts";
 
 export const dynamic = "force-dynamic";
@@ -63,6 +64,8 @@ export default async function HomePage() {
           }),
         }}
       />
+
+      <Scroll3DExperience />
 
       <HeroSection />
 

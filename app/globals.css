@@ -157,4 +157,95 @@
   .link-underline:hover {
     text-decoration-thickness: 2px;
   }
+
+  /* Scroll-driven 3D stage */
+  .scroll3d {
+    position: relative;
+    height: 340vh;
+    background:
+      radial-gradient(1200px 900px at 75% 30%, rgba(95, 160, 255, 0.18) 0%, rgba(0, 0, 0, 0) 60%),
+      radial-gradient(900px 700px at 20% 70%, rgba(244, 179, 63, 0.2) 0%, rgba(0, 0, 0, 0) 58%),
+      #05070d;
+    overflow: clip;
+  }
+
+  .scroll3d-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: grid;
+    align-items: end;
+  }
+
+  .scroll3d-canvas-wrap {
+    position: absolute;
+    inset: 0;
+  }
+
+  .scroll3d-overlay {
+    position: relative;
+    z-index: 1;
+    max-width: 700px;
+    padding: 0 1rem 2.5rem;
+    color: #f4f6fb;
+  }
+
+  .scroll3d-kicker {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin-bottom: 0.8rem;
+  }
+
+  .scroll3d-title {
+    font-family: var(--font-playfair), Georgia, serif;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 0.95;
+    font-size: clamp(2.6rem, 7vw, 5.6rem);
+    margin-bottom: 0.7rem;
+  }
+
+  .scroll3d-description {
+    max-width: 35ch;
+    font-size: clamp(0.96rem, 2.1vw, 1.16rem);
+    color: rgba(238, 242, 252, 0.84);
+    margin-bottom: 1.2rem;
+  }
+
+  .scroll3d-meter {
+    width: min(320px, 88vw);
+    height: 3px;
+    background: rgba(255, 255, 255, 0.22);
+    margin-bottom: 0.8rem;
+    transform-origin: left center;
+    overflow: hidden;
+  }
+
+  .scroll3d-meter span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #61beff 0%, #f1be59 100%);
+    transform-origin: left center;
+    transition: transform 120ms linear;
+  }
+
+  .scroll3d-hint {
+    font-size: 0.86rem;
+    color: rgba(226, 234, 250, 0.72);
+  }
+
+  @media (min-width: 768px) {
+    .scroll3d-overlay {
+      padding: 0 2.5rem 3rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .scroll3d-meter span {
+      transition: none;
+    }
+  }
 }
