@@ -65,7 +65,6 @@ export default async function HomePage() {
         }}
       />
 
-      <Scroll3DExperience />
 
       <HeroSection />
 
