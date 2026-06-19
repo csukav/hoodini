@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
-import HeroSection from "@/components/HeroSection";
-import ProductCard from "@/components/ProductCard";
 import Scroll3DExperience from "@/components/Scroll3DExperience";
 import { getProducts } from "@/lib/firestoreProducts";
+import { formatPrice } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -64,87 +63,124 @@ export default async function HomePage() {
           }),
         }}
       />
+        <main className="three-home">
+          <Scroll3DExperience />
 
+          <section className="three-home-intro" aria-label="Hoodini bemutatkozás">
+            <p className="three-home-kicker">HOODINI 3D EDITION</p>
+            <h2 className="three-home-heading">Streetwear, ami mozgásban él.</h2>
+            <p className="three-home-lead">
+              Ez a kollekció görgetésre reagál: fémes textúrák, dinamikus fények és
+              karakteres szabások egyetlen digitális térben.
+            </p>
+            <div className="three-home-actions">
+              <Link href="/products" className="btn-dark">
+                Fedezd fel a dropot
+              </Link>
+              <Link href="/about" className="btn-outline three-home-outline">
+                Márkatörténet
+              </Link>
+            </div>
+          </section>
 
-      <HeroSection />
-
-      {/* ──────────── New Arrivals ──────────── */}
-      <section
-        id="featured"
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24"
-        aria-labelledby="new-arrivals-heading"
-      >
-        <div className="flex items-end justify-between mb-8 pb-4 border-b border-stone-200">
-          <div>
-            <p className="label-xs text-stone-500 mb-1">Frissen érkezett</p>
-            <h2
-              id="new-arrivals-heading"
-              className="heading-display text-3xl sm:text-4xl text-stone-950"
-            >
-              Új kollekció
-            </h2>
-          </div>
-          <Link
-            href="/products"
-            className="label-xs text-stone-700 hover:text-stone-950 link-underline hidden sm:block transition-colors"
+          <section
+            id="featured"
+            className="three-home-section"
+            aria-labelledby="new-arrivals-heading"
           >
-            Összes megtekintése
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {newArrivals.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
-
-        <div className="mt-6 text-center sm:hidden">
-          <Link
-            href="/products"
-            className="label-xs text-stone-700 hover:text-stone-950 link-underline"
-          >
-            Összes megtekintése
-          </Link>
-        </div>
-      </section>
-
-      {/* ──────────── Category editorial ──────────── */}
-      <section
-        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-24"
-        aria-label="Kategóriák"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {categories.map((cat) => (
-            <Link
-              key={cat.label}
-              href={cat.href}
-              className="group relative overflow-hidden block"
-              style={{ aspectRatio: "4/5" }}
-            >
-              <Image
-                src={cat.image}
-                alt={cat.label}
-                fill
-                sizes="(max-width: 768px) 100vw, 50vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div
-                className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent"
-                aria-hidden="true"
-              />
-              <div className="absolute bottom-8 left-8">
-                <p className="heading-display text-white text-3xl sm:text-4xl mb-2">
-                  {cat.label}
-                </p>
-                <p className="text-stone-300 text-sm mb-5">{cat.sub}</p>
-                <span className="btn-white text-xs py-2.5 px-5">
-                  VÁSÁROLJ MOST
-                </span>
+            <div className="three-home-section-head">
+              <div>
+                <p className="three-home-kicker">Frissen érkezett</p>
+                <h2 id="new-arrivals-heading" className="three-home-title">
+                  New Arrivals
+                </h2>
               </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+              <Link href="/products" className="three-home-link">
+                Összes termék
+              </Link>
+            </div>
+
+            <div className="three-product-grid">
+              {newArrivals.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/products/${product.slug}`}
+                  className="three-product-card"
+                >
+                  <div className="three-product-image-wrap">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                      className="three-product-image"
+                    />
+                  </div>
+                  <div className="three-product-meta">
+                    <p className="three-product-name">{product.name}</p>
+                    <p className="three-product-category">{product.category}</p>
+                    <p className="three-product-price">{formatPrice(product.price)}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="three-home-section" aria-labelledby="best-sellers-heading">
+            <div className="three-home-section-head">
+              <div>
+                <p className="three-home-kicker">Kiemelt darabok</p>
+                <h2 id="best-sellers-heading" className="three-home-title">
+                  Best Sellers
+                </h2>
+              </div>
+            </div>
+
+            <div className="three-rail" role="list">
+              {bestSellers.map((product) => (
+                <Link
+                  key={product.id}
+                  href={`/products/${product.slug}`}
+                  className="three-rail-item"
+                  role="listitem"
+                >
+                  <span className="three-rail-index">0{(bestSellers.indexOf(product) % 9) + 1}</span>
+                  <span className="three-rail-name">{product.name}</span>
+                  <span className="three-rail-price">{formatPrice(product.price)}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <section className="three-home-section three-home-bottom" aria-label="Kategóriák">
+            <div className="three-home-section-head">
+              <div>
+                <p className="three-home-kicker">Kategória fókusz</p>
+                <h2 className="three-home-title">Build Your Uniform</h2>
+              </div>
+            </div>
+
+            <div className="three-category-grid">
+              {categories.map((cat) => (
+                <Link key={cat.label} href={cat.href} className="three-category-card">
+                  <Image
+                    src={cat.image}
+                    alt={cat.label}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="three-category-image"
+                  />
+                  <div className="three-category-overlay" aria-hidden="true" />
+                  <div className="three-category-content">
+                    <p className="three-category-label">{cat.label}</p>
+                    <p className="three-category-sub">{cat.sub}</p>
+                    <span className="three-home-link">Megnyitás</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </section>
+        </main>
     </>
   );
 }
