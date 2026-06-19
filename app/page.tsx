@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
-import Scroll3DExperience from "@/components/Scroll3DExperience";
 import { getProducts } from "@/lib/firestoreProducts";
 import { formatPrice } from "@/lib/utils";
 
@@ -63,25 +62,8 @@ export default async function HomePage() {
           }),
         }}
       />
-        <main className="three-home">
-          <Scroll3DExperience />
+        <main>
 
-          <section className="three-home-intro" aria-label="Hoodini bemutatkozás">
-            <p className="three-home-kicker">HOODINI 3D EDITION</p>
-            <h2 className="three-home-heading">Streetwear, ami mozgásban él.</h2>
-            <p className="three-home-lead">
-              Ez a kollekció görgetésre reagál: fémes textúrák, dinamikus fények és
-              karakteres szabások egyetlen digitális térben.
-            </p>
-            <div className="three-home-actions">
-              <Link href="/products" className="btn-dark">
-                Fedezd fel a dropot
-              </Link>
-              <Link href="/about" className="btn-outline three-home-outline">
-                Márkatörténet
-              </Link>
-            </div>
-          </section>
 
           <section
             id="featured"
