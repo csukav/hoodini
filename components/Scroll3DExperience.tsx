@@ -1,161 +1,199 @@
 "use client";
 
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Environment } from "@react-three/drei";
-import { useEffect, useMemo, useRef, useState } from "react";
-import type { Mesh } from "three";
-
-type SceneShapesProps = {
-  progress: number;
-};
+import { Environment, RoundedBox } from "@react-three/drei";
+import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
+import type { Group } from "three";
 
 const phases = [
   {
-    title: "Origins",
-    description: "A forma nyugodt, tiszta, fókuszált.",
+    title: "HOODINI",
+    description: "Prémium streetwear, minden napra.",
   },
   {
-    title: "Momentum",
-    description: "Görgetésre nő az energia, elkezd forogni a tér.",
+    title: "CRAFTWORK",
+    description: "Precíz varratok, szelektált anyagok.",
   },
   {
-    title: "Velocity",
-    description: "A geometriák szétnyílnak, a mozgás intenzívebbé válik.",
+    title: "DETAILS",
+    description: "A részletek teszik különlegessé.",
   },
   {
-    title: "Impact",
-    description: "A végén minden elem összeáll egy markáns finálévá.",
+    title: "YOUR DROP",
+    description: "Fedezd fel az aktuális kollekcót.",
   },
 ] as const;
 
-function clamp01(value: number): number {
-  return Math.min(1, Math.max(0, value));
+function clamp01(v: number) {
+  return Math.min(1, Math.max(0, v));
 }
 
 function useScrollProgress(): number {
   const [progress, setProgress] = useState(0);
-
   useEffect(() => {
     let ticking = false;
-
     const update = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
-      const next = max > 0 ? window.scrollY / max : 0;
-      setProgress(clamp01(next));
+      setProgress(clamp01(max > 0 ? window.scrollY / max : 0));
       ticking = false;
     };
-
     const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        window.requestAnimationFrame(update);
-      }
+      if (!ticking) { ticking = true; window.requestAnimationFrame(update); }
     };
-
     update();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onScroll);
-
     return () => {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
   }, []);
-
   return progress;
 }
 
-function SceneShapes({ progress }: SceneShapesProps) {
-  const knotRef = useRef<Mesh>(null);
-  const orbitRef = useRef<Mesh>(null);
-  const ringRefs = useRef<Mesh[]>([]);
+/* ── Hoodie 3D model ─────────────────────────────────────────────────── */
 
-  const ringOffsets = useMemo(() => [-1.1, -0.35, 0.35, 1.1], []);
+function HoodieModel({ progress }: { progress: number }) {
+  const groupRef = useRef<Group>(null);
 
   useFrame((state, delta) => {
-    const smooth = 1 - Math.exp(-delta * 7);
-    const p = progress;
+    if (!groupRef.current) return;
+    const smooth = 1 - Math.exp(-delta * 3.5);
 
-    if (knotRef.current) {
-      const knot = knotRef.current;
-      knot.rotation.x += delta * (0.2 + p * 1.3);
-      knot.rotation.y += delta * (0.35 + p * 1.6);
-      knot.position.z += (p * 1.1 - knot.position.z) * smooth;
-      const targetScale = 1 + p * 0.55;
-      knot.scale.x += (targetScale - knot.scale.x) * smooth;
-      knot.scale.y += (targetScale - knot.scale.y) * smooth;
-      knot.scale.z += (targetScale - knot.scale.z) * smooth;
-    }
+    // Continuous rotation, scroll speeds it up
+    groupRef.current.rotation.y += delta * (0.28 + progress * 0.85);
 
-    if (orbitRef.current) {
-      const orbit = orbitRef.current;
-      orbit.rotation.z += delta * 0.9;
-      orbit.position.y += ((0.35 - p * 1.1) - orbit.position.y) * smooth;
-      orbit.position.x += ((p * 0.9 - 0.45) - orbit.position.x) * smooth;
-    }
+    // Gentle vertical float
+    const floatY = Math.sin(state.clock.elapsedTime * 0.55) * 0.09;
+    groupRef.current.position.y += (floatY - groupRef.current.position.y) * smooth;
 
-    ringRefs.current.forEach((ring, index) => {
-      if (!ring) {
-        return;
-      }
-      const offset = ringOffsets[index] ?? 0;
-      const wave = Math.sin(state.clock.elapsedTime * 0.8 + index * 0.9) * 0.12;
-      ring.rotation.x += delta * (0.15 + index * 0.1);
-      ring.rotation.y += delta * (0.25 + index * 0.07);
-      ring.position.y += (offset + wave + p * 0.35) * smooth - ring.position.y * smooth;
-      ring.position.x += ((index - 1.5) * 0.35 + p * 0.2) * smooth - ring.position.x * smooth;
-      ring.position.z += (-p * (0.2 + index * 0.1)) * smooth - ring.position.z * smooth;
-    });
+    // Scroll: slight forward tilt reveals hoodie back
+    const targetRX = progress * 0.22;
+    groupRef.current.rotation.x +=
+      (targetRX - groupRef.current.rotation.x) * smooth;
+
+    // Scroll: grow slightly
+    const s = 0.91 + progress * 0.24;
+    groupRef.current.scale.x += (s - groupRef.current.scale.x) * smooth;
+    groupRef.current.scale.y += (s - groupRef.current.scale.y) * smooth;
+    groupRef.current.scale.z += (s - groupRef.current.scale.z) * smooth;
   });
 
   return (
-    <group>
-      <mesh ref={knotRef} castShadow receiveShadow>
-        <torusKnotGeometry args={[0.95, 0.27, 190, 24]} />
-        <meshStandardMaterial
-          color="#e9b44c"
-          metalness={0.6}
-          roughness={0.18}
-          emissive="#8d5c1a"
-          emissiveIntensity={0.25}
-        />
+    <group ref={groupRef}>
+      {/* ── BODY ── */}
+      <RoundedBox args={[1.38, 1.52, 0.54]} radius={0.07} smoothness={4} position={[0, -0.1, 0]}>
+        <meshStandardMaterial color="#111827" roughness={0.82} metalness={0.08} />
+      </RoundedBox>
+
+      {/* ── SHOULDER FILLS ── */}
+      <mesh position={[-0.78, 0.52, 0]}>
+        <sphereGeometry args={[0.27, 20, 20]} />
+        <meshStandardMaterial color="#111827" roughness={0.82} metalness={0.08} />
+      </mesh>
+      <mesh position={[0.78, 0.52, 0]}>
+        <sphereGeometry args={[0.27, 20, 20]} />
+        <meshStandardMaterial color="#111827" roughness={0.82} metalness={0.08} />
       </mesh>
 
-      <mesh ref={orbitRef} position={[-0.4, 0.35, -0.45]}>
-        <icosahedronGeometry args={[0.52, 1]} />
-        <meshStandardMaterial
-          color="#2f88ff"
-          roughness={0.22}
-          metalness={0.35}
-          emissive="#0d2f5a"
-          emissiveIntensity={0.35}
-          flatShading
-        />
-      </mesh>
-
-      {ringOffsets.map((offset, index) => (
-        <mesh
-          key={offset}
-          ref={(el) => {
-            if (el) {
-              ringRefs.current[index] = el;
-            }
-          }}
-          position={[0, offset, -0.6 - index * 0.15]}
-        >
-          <torusGeometry args={[1.7 + index * 0.1, 0.017, 12, 128]} />
-          <meshStandardMaterial
-            color={index % 2 === 0 ? "#8ec5ff" : "#ffdca8"}
-            transparent
-            opacity={0.72}
-            metalness={0.45}
-            roughness={0.35}
-          />
+      {/* ── LEFT SLEEVE ── */}
+      <group position={[-1.09, 0.37, 0]} rotation={[0, 0.1, 0.27]}>
+        <mesh>
+          <cylinderGeometry args={[0.215, 0.195, 1.05, 20]} />
+          <meshStandardMaterial color="#111827" roughness={0.82} metalness={0.08} />
         </mesh>
-      ))}
+        {/* left cuff */}
+        <mesh position={[0, -0.58, 0]}>
+          <cylinderGeometry args={[0.207, 0.207, 0.12, 20]} />
+          <meshStandardMaterial color="#e9b44c" roughness={0.46} metalness={0.35}
+            emissive="#7a4d10" emissiveIntensity={0.18} />
+        </mesh>
+      </group>
+
+      {/* ── RIGHT SLEEVE ── */}
+      <group position={[1.09, 0.37, 0]} rotation={[0, -0.1, -0.27]}>
+        <mesh>
+          <cylinderGeometry args={[0.215, 0.195, 1.05, 20]} />
+          <meshStandardMaterial color="#111827" roughness={0.82} metalness={0.08} />
+        </mesh>
+        {/* right cuff */}
+        <mesh position={[0, -0.58, 0]}>
+          <cylinderGeometry args={[0.207, 0.207, 0.12, 20]} />
+          <meshStandardMaterial color="#e9b44c" roughness={0.46} metalness={0.35}
+            emissive="#7a4d10" emissiveIntensity={0.18} />
+        </mesh>
+      </group>
+
+      {/* ── HOOD (outer dome) ── */}
+      <mesh position={[0, 0.92, -0.11]} rotation={[0.14, 0, 0]}>
+        <sphereGeometry args={[0.56, 36, 36, 0, Math.PI * 2, 0, Math.PI * 0.58]} />
+        <meshStandardMaterial color="#111827" roughness={0.82} metalness={0.08}
+          side={THREE.DoubleSide} />
+      </mesh>
+      {/* hood inner lining (visible when rotated) */}
+      <mesh position={[0, 0.92, -0.11]} rotation={[0.14, 0, 0]}>
+        <sphereGeometry args={[0.52, 36, 36, 0, Math.PI * 2, 0, Math.PI * 0.58]} />
+        <meshStandardMaterial color="#1e2640" roughness={0.9} side={THREE.BackSide} />
+      </mesh>
+
+      {/* ── HOOD OPENING RIM ── */}
+      <mesh position={[0, 0.72, 0.16]} rotation={[-0.36, 0, 0]}>
+        <torusGeometry args={[0.36, 0.044, 14, 56, Math.PI * 1.62]} />
+        <meshStandardMaterial color="#e9b44c" roughness={0.44} metalness={0.38}
+          emissive="#7a4d10" emissiveIntensity={0.22} />
+      </mesh>
+
+      {/* ── COLLAR ── */}
+      <mesh position={[0, 0.56, 0]}>
+        <cylinderGeometry args={[0.22, 0.24, 0.13, 28]} />
+        <meshStandardMaterial color="#e9b44c" roughness={0.46} metalness={0.35}
+          emissive="#7a4d10" emissiveIntensity={0.18} />
+      </mesh>
+
+      {/* ── KANGAROO POCKET ── */}
+      <RoundedBox args={[0.76, 0.37, 0.055]} radius={0.026} position={[0, -0.19, 0.285]}>
+        <meshStandardMaterial color="#e9b44c" roughness={0.52} metalness={0.28}
+          emissive="#6b3e0a" emissiveIntensity={0.14} />
+      </RoundedBox>
+      {/* pocket centre seam */}
+      <mesh position={[0, -0.19, 0.316]}>
+        <boxGeometry args={[0.013, 0.35, 0.008]} />
+        <meshStandardMaterial color="#0d1117" roughness={0.9} />
+      </mesh>
+
+      {/* ── BOTTOM HEM ── */}
+      <mesh position={[0, -0.885, 0]}>
+        <cylinderGeometry args={[0.71, 0.71, 0.1, 36]} />
+        <meshStandardMaterial color="#e9b44c" roughness={0.48} metalness={0.35}
+          emissive="#7a4d10" emissiveIntensity={0.18} />
+      </mesh>
+
+      {/* ── DRAWSTRINGS ── */}
+      <mesh position={[-0.13, 0.41, 0.286]}>
+        <cylinderGeometry args={[0.016, 0.016, 0.58, 8]} />
+        <meshStandardMaterial color="#c8d4e8" roughness={0.54} metalness={0.44} />
+      </mesh>
+      <mesh position={[0.13, 0.41, 0.286]}>
+        <cylinderGeometry args={[0.016, 0.016, 0.58, 8]} />
+        <meshStandardMaterial color="#c8d4e8" roughness={0.54} metalness={0.44} />
+      </mesh>
+      {/* aglets (metal tips) */}
+      <mesh position={[-0.13, 0.11, 0.286]}>
+        <cylinderGeometry args={[0.022, 0.018, 0.065, 8]} />
+        <meshStandardMaterial color="#e9b44c" roughness={0.32} metalness={0.7}
+          emissive="#7a4d10" emissiveIntensity={0.25} />
+      </mesh>
+      <mesh position={[0.13, 0.11, 0.286]}>
+        <cylinderGeometry args={[0.022, 0.018, 0.065, 8]} />
+        <meshStandardMaterial color="#e9b44c" roughness={0.32} metalness={0.7}
+          emissive="#7a4d10" emissiveIntensity={0.25} />
+      </mesh>
     </group>
   );
 }
+
+/* ── Scene wrapper ────────────────────────────────────────────────────── */
 
 export default function Scroll3DExperience() {
   const progress = useScrollProgress();
@@ -163,22 +201,27 @@ export default function Scroll3DExperience() {
   const activePhase = phases[activeIndex];
 
   return (
-    <section className="scroll3d" aria-label="Interaktív 3D bemutató">
+    <section className="scroll3d" aria-label="Interaktív 3D pulcsi bemutató">
       <div className="scroll3d-sticky">
         <div className="scroll3d-canvas-wrap" aria-hidden="true">
-          <Canvas camera={{ position: [0, 0, 4.5], fov: 52 }}>
+          <Canvas camera={{ position: [0, 0, 4.2], fov: 50 }}>
             <color attach="background" args={["#05070d"]} />
-            <fog attach="fog" args={["#05070d", 4, 10.5]} />
-            <ambientLight intensity={0.5} />
-            <directionalLight position={[3.5, 3, 2]} intensity={1.3} />
-            <pointLight position={[-3.5, -2.2, 2.8]} intensity={1.8} color="#8ec5ff" />
-            <SceneShapes progress={progress} />
+            <fog attach="fog" args={["#05070d", 5, 12]} />
+
+            {/* Lighting tuned for fabric/clothing */}
+            <ambientLight intensity={0.45} />
+            <directionalLight position={[2, 4, 3]} intensity={1.6} color="#f8f0e8" />
+            <directionalLight position={[-3, 1, -2]} intensity={0.55} color="#8ab4f8" />
+            <pointLight position={[0, -1.5, 3.5]} intensity={0.9} color="#f2c96b" />
+            <pointLight position={[0, 3.5, -1]} intensity={0.7} color="#e9b44c" />
+
+            <HoodieModel progress={progress} />
             <Environment preset="city" />
           </Canvas>
         </div>
 
         <div className="scroll3d-overlay">
-          <p className="scroll3d-kicker">Scroll-Reactive 3D</p>
+          <p className="scroll3d-kicker">Hoodini 3D Konfigurátor</p>
           <h1 className="scroll3d-title">{activePhase.title}</h1>
           <p className="scroll3d-description">{activePhase.description}</p>
 
@@ -186,7 +229,7 @@ export default function Scroll3DExperience() {
             <span style={{ transform: `scaleX(${Math.max(progress, 0.03)})` }} />
           </div>
 
-          <p className="scroll3d-hint">Görgess lejjebb a jelenet transzformációjához.</p>
+          <p className="scroll3d-hint">Görgess lejjebb a részletek felfedezéséhez.</p>
         </div>
       </div>
     </section>
