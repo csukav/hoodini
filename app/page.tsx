@@ -3,6 +3,7 @@ import Script from "next/script";
 import Link from "next/link";
 import Image from "next/image";
 import { getProducts } from "@/lib/firestoreProducts";
+import HeroSection from "@/components/HeroSection";
 import { formatPrice } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -64,7 +65,7 @@ export default async function HomePage() {
       />
         <main>
 
-
+          <HeroSection />
           <section
             id="featured"
             className="three-home-section"
