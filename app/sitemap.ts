@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { getProducts } from "@/lib/firestoreProducts";
+import { BLOG_POSTS } from "@/lib/blogPosts";
 
 const BASE_URL = "https://hoodini.hu";
 const CATEGORY_SLUGS = ["hoodie", "polok", "nadragok", "sale"];
@@ -156,5 +157,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  return [...staticPages, ...categoryPages, ...productUrls];
+  const blogPages: MetadataRoute.Sitemap = [
+    {
+      url: `${BASE_URL}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+    ...BLOG_POSTS.map((post) => ({
+      url: `${BASE_URL}/blog/${post.slug}`,
+      lastModified: new Date(post.updatedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.7,
+    })),
+  ];
+
+  return [...staticPages, ...categoryPages, ...blogPages, ...productUrls];
 }

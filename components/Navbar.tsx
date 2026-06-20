@@ -11,12 +11,17 @@ const leftLinks = [
   { href: "/products?category=nadragok", label: "NADRÁGOK" },
   { href: "/products?category=sale", label: "SALE" },
 ];
-const rightLinks = [{ href: "/help", label: "GYIK" }];
+const rightLinks = [
+  { href: "/blog", label: "BLOG" },
+  { href: "/help", label: "GYIK" },
+];
 const mobileLinks = [
   { href: "/products?category=hoodie", label: "Hoodie" },
   { href: "/products?category=polo", label: "Pólók" },
   { href: "/products?category=nadragok", label: "Nadrágok" },
   { href: "/products?category=sale", label: "Sale" },
+  { href: "/blog", label: "Blog" },
+  { href: "/help", label: "GYIK" },
 ];
 
 export default function Navbar() {
