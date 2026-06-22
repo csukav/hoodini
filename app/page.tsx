@@ -5,6 +5,7 @@ import Image from "next/image";
 import HeroSection from "@/components/HeroSection";
 import ProductCard from "@/components/ProductCard";
 import { getProducts } from "@/lib/firestoreProducts";
+import { BLOG_POSTS } from "@/lib/blogPosts";
 
 export const dynamic = "force-dynamic";
 
@@ -35,6 +36,7 @@ export default async function HomePage() {
   const products = await getProducts();
   const newArrivals = products.slice(0, 4);
   const bestSellers = products.slice(4, 8);
+  const latestBlogPosts = BLOG_POSTS.slice(0, 3);
 
   return (
     <>
@@ -141,6 +143,62 @@ export default async function HomePage() {
               </div>
             </Link>
           ))}
+        </div>
+      </section>
+
+      {/* ──────────── Latest blog posts ──────────── */}
+      <section
+        className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 md:pb-24"
+        aria-labelledby="blog-latest-heading"
+      >
+        <div className="flex items-end justify-between mb-8 pb-4 border-b border-stone-200">
+          <div>
+            <p className="label-xs text-stone-500 mb-1">SEO Magazin</p>
+            <h2
+              id="blog-latest-heading"
+              className="heading-display text-3xl sm:text-4xl text-stone-950"
+            >
+              Legfrissebb blogcikkek
+            </h2>
+          </div>
+          <Link
+            href="/blog"
+            className="label-xs text-stone-700 hover:text-stone-950 link-underline hidden sm:block transition-colors"
+          >
+            Összes cikk
+          </Link>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {latestBlogPosts.map((post) => (
+            <article
+              key={post.slug}
+              className="border border-stone-200 bg-white p-6 flex flex-col"
+            >
+              <p className="text-xs text-stone-500 mb-3">{post.publishedAt}</p>
+              <h3 className="heading-display text-2xl text-stone-950 leading-snug">
+                {post.title}
+              </h3>
+              <p className="mt-3 text-sm text-stone-600 leading-relaxed flex-1">
+                {post.excerpt}
+              </p>
+              <Link
+                href={`/blog/${post.slug}`}
+                className="mt-6 label-xs text-stone-700 hover:text-stone-950 link-underline"
+              >
+                Elolvasom
+              </Link>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-6 text-center sm:hidden">
+          <Link
+            href="/blog"
+            className="label-xs text-stone-700 hover:text-stone-950 link-underline"
+          >
+            Összes cikk
+          </Link>
         </div>
       </section>
     </>

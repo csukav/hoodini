@@ -4,7 +4,6 @@ import Script from "next/script";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
-import NewsletterModal from "@/components/NewsletterModal";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -112,37 +111,10 @@ export default function RootLayout({
       <body className="font-sans bg-stone-50 text-stone-950 antialiased">
         <CartProvider>
           <Navbar />
-          <NewsletterModal />
           <main id="main-content">{children}</main>
 
           {/* ── Footer ── */}
           <footer className="bg-stone-950 text-stone-400">
-            {/* Newsletter */}
-            <div className="border-b border-stone-800">
-              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div>
-                  <p className="label-xs text-stone-200 mb-1">Iratkozz fel</p>
-                  <p className="text-stone-400 text-sm">
-                    Első rendelésedből 10% kedvezmény + exkluzív ajánlatok.
-                  </p>
-                </div>
-                <form className="flex w-full md:w-auto gap-0">
-                  <input
-                    type="email"
-                    placeholder="Email cím"
-                    aria-label="Email cím a hírlevélhez"
-                    className="flex-1 md:w-72 bg-stone-900 border border-stone-700 px-4 py-3 text-sm text-stone-100 placeholder-stone-600 outline-none focus:border-stone-400 transition-colors"
-                  />
-                  <button
-                    type="submit"
-                    className="btn-dark px-6 bg-stone-100 text-stone-950 hover:bg-white shrink-0"
-                  >
-                    FELIRATKOZÁS
-                  </button>
-                </form>
-              </div>
-            </div>
-
             {/* Links */}
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8 pb-12 border-b border-stone-800">
