@@ -19,19 +19,19 @@
   --animate-fade-in: fadeIn 0.4s ease-out;
   --animate-slide-up: slideUp 0.5s cubic-bezier(0.16,1,0.3,1) both;
   --animate-marquee: marquee 28s linear infinite;
+}
 
-  @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
-  }
-  @keyframes slideUp {
-    0% { opacity: 0; transform: translateY(16px); }
-    100% { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes marquee {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-  }
+@keyframes fadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes slideUp {
+  0% { opacity: 0; transform: translateY(16px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
 }
 
 @layer base {
@@ -65,97 +65,36 @@
   /* Typography */
   .heading-display {
     font-family: var(--font-playfair), Georgia, serif;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 0.95;
+    @apply font-bold -tracking-[0.02em] leading-[0.95];
   }
 
   .label-xs {
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+    @apply text-xs font-semibold uppercase tracking-widest;
   }
 
-  /* Buttons */
-  .btn-dark {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 2rem;
-    background: #111110;
-    color: #fafaf8;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition:
-      background 0.2s ease,
-      color 0.2s ease;
-    white-space: nowrap;
+  /* Buttons - Base styles */
+  [class*="btn-"] {
+    @apply inline-flex items-center justify-center gap-2 px-8 py-3 text-xs font-semibold uppercase tracking-wider transition-all duration-200 whitespace-nowrap;
   }
-  .btn-dark:hover {
-    background: #2a2a28;
+
+  .btn-dark {
+    @apply bg-stone-950 text-stone-50 hover:bg-stone-800;
   }
 
   .btn-outline {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 2rem;
-    background: transparent;
-    color: #111110;
-    border: 1px solid #111110;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition:
-      background 0.2s ease,
-      color 0.2s ease;
-    white-space: nowrap;
-  }
-  .btn-outline:hover {
-    background: #111110;
-    color: #fafaf8;
+    @apply border border-stone-950 bg-transparent text-stone-950 hover:bg-stone-950 hover:text-stone-50;
   }
 
   .btn-white {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    padding: 0.75rem 2rem;
-    background: #fafaf8;
-    color: #111110;
-    font-size: 0.7rem;
-    font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    transition: background 0.2s ease;
-    white-space: nowrap;
-  }
-  .btn-white:hover {
-    background: #e8e8e3;
+    @apply bg-stone-50 text-stone-950 hover:bg-stone-200;
   }
 
-  /* Section divider */
+  /* Utilities */
   .divider {
-    width: 100%;
-    height: 1px;
-    background: #e8e8e3;
+    @apply h-px w-full bg-stone-200;
   }
 
-  /* Text link underline */
   .link-underline {
-    text-decoration: underline;
-    text-underline-offset: 3px;
-    text-decoration-thickness: 1px;
+    @apply underline decoration-1 underline-offset-1 hover:decoration-2;
   }
-  .link-underline:hover {
-    text-decoration-thickness: 2px;
-  }
-
 }

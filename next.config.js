@@ -1,9 +1,13 @@
 /** @type {import('next').NextConfig} */
-const path = require("path");
-
 const nextConfig = {
   turbopack: {
     root: __dirname,
+    resolveAlias: {
+      css: require.resolve("./app/globals.css"),
+    },
+  },
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
   },
   images: {
     remotePatterns: [
