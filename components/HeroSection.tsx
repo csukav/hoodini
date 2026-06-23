@@ -15,6 +15,7 @@ export default function HeroSection() {
         alt="Hero kép a 2026 tavasz–nyár kollekcióról"
         fill
         priority
+        fetchPriority="high"
         quality={95}
         sizes="100vw"
         className="object-cover"
