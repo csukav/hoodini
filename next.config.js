@@ -7,6 +7,7 @@ const nextConfig = {
     },
   },
   experimental: {
+    optimizeCss: true,
     optimizePackageImports: ["lucide-react"],
   },
   images: {
