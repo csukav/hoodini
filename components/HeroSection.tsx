@@ -43,7 +43,7 @@ export default function HeroSection() {
           </Link>
           <Link
             href="#featured"
-            className="btn-outline border-white text-white hover:bg-white hover:text-stone-950"
+            className="btn-white border-white text-white hover:bg-white hover:text-stone-950"
           >
             Kiemelt termékek
           </Link>
