@@ -126,7 +126,7 @@ export default function RootLayout({
                       { label: "Pólók", href: "/products?category=polok" },
                       {
                         label: "Nadrágok",
-                        href: "/products?category=nadragok",
+                        href: "/products?category=nadrag",
                       },
                       { label: "Kiegészítők", href: "/products" },
                       { label: "Sale", href: "/products?category=sale" },

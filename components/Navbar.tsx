@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 const leftLinks = [
   { href: "/products?category=hoodie", label: "HOODIE" },
   { href: "/products?category=polo", label: "PÓLÓK" },
-  { href: "/products?category=nadragok", label: "NADRÁGOK" },
+  { href: "/products?category=nadrag", label: "NADRÁGOK" },
   { href: "/products?category=sale", label: "SALE" },
 ];
 const rightLinks = [
@@ -18,7 +18,7 @@ const rightLinks = [
 const mobileLinks = [
   { href: "/products?category=hoodie", label: "Hoodie" },
   { href: "/products?category=polo", label: "Pólók" },
-  { href: "/products?category=nadragok", label: "Nadrágok" },
+  { href: "/products?category=nadrag", label: "Nadrágok" },
   { href: "/products?category=sale", label: "Sale" },
   { href: "/blog", label: "Blog" },
   { href: "/help", label: "GYIK" },
