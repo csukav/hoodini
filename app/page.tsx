@@ -30,6 +30,13 @@ const categories = [
     image:
       "https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=900&q=80",
   },
+  {
+    label: "NADRÁG",
+    sub: "Divatos nadrágok.",
+    href: "/products",
+    image:
+      "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=900&q=80",
+  }
 ];
 
 export default async function HomePage() {
