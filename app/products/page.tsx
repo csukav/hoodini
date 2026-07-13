@@ -41,7 +41,7 @@ export default async function ProductsPage({
     const categoryMap: Record<string, string> = {
       hoodie: "Hoodie",
       polok: "Pólók",
-      nadragok: "Nadrágok",
+      nadrag: "Nadrág",
       sale: "Sale",
     };
     return categoryMap[slug] || slug;
