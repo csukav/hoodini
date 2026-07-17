@@ -74,3 +74,13 @@ export interface Coupon {
   createdAt: Date;
   minOrderValue?: number;
 }
+
+export interface SiteVisit {
+  id: string;
+  pathname: string;
+  referrer?: string;
+  sessionId: string;
+  userAgent?: string;
+  language?: string;
+  createdAt: Date;
+}

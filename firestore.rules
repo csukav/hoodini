@@ -19,6 +19,13 @@
         allow write: if isAdmin();
         }
 
+        // Site visits collection - public write for pageview tracking, admin read
+        match /siteVisits/{document} {
+        allow create: if true;
+        allow read: if isAdmin();
+        allow update, delete: if false;
+        }
+
         // Orders collection - anyone can create, only admins can read/update/delete
         match /orders/{document=**} {
         allow create: if true;

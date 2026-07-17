@@ -311,6 +311,12 @@ export default function AdminOrdersPage() {
           </span>
           <div className="flex items-center gap-3">
             <Link
+              href="/admin/dashboard"
+              className="border border-stone-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-stone-600 hover:bg-stone-100 inline-flex items-center gap-1.5"
+            >
+              Dashboard
+            </Link>
+            <Link
               href="/admin"
               className="border border-stone-300 px-4 py-2 text-xs font-semibold uppercase tracking-widest text-stone-600 hover:bg-stone-100 inline-flex items-center gap-1.5"
             >

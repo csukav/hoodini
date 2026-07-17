@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import Script from "next/script";
+import { Suspense } from "react";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
+import VisitTracker from "@/components/VisitTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -109,6 +111,9 @@ export default function RootLayout({
         `}
       </Script>
       <body className="font-sans bg-stone-50 text-stone-950 antialiased">
+        <Suspense fallback={null}>
+          <VisitTracker />
+        </Suspense>
         <CartProvider>
           <Navbar />
           <main id="main-content">{children}</main>
