@@ -242,6 +242,7 @@ export default function RootLayout({
                   >
                     Készítette: Csuka Viktor
                   </a>
+                  &middot;{" "}
                   <a
                     href="#"
                     className="hover:text-stone-400 transition-colors"
